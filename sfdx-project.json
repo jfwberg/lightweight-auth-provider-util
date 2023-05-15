@@ -1,0 +1,17 @@
+{
+  "packageDirectories": [
+    {
+      "path": "force-app",
+      "default": true,
+      "package": "Auth Provider Util",
+      "versionName": "ver 0.1",
+      "versionNumber": "0.1.0.NEXT",
+      "versionDescription": "A generic Auth Provider Utility to add support for User Context Mapping and basic (error) logging."
+    }
+  ],
+  "name": "auth-provider-util",
+  "namespace": "utl",
+  "sfdcLoginUrl": "https://login.salesforce.com",
+  "sourceApiVersion": "57.0",
+  "packageAliases": {}
+}

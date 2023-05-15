@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>57.0</apiVersion>
+    <description>This flow populates the combination of the local user Id and the Auth Provider API Name combination in the User Id Auth Provider Validation Field. This is to validate the uniqueness of the user and auth provider. Each user should only have a single mapping to an Auth Provider.</description>
+    <environments>Default</environments>
+    <formulas>
+        <description>Combined value of User Id and Auth Provider</description>
+        <name>User_Id_Auth_Provider_Validation</name>
+        <dataType>String</dataType>
+        <expression>{!$Record.Auth_Provider_Name__c} + &apos;_&apos; + {!$Record.User__c}</expression>
+    </formulas>
+    <interviewLabel>Set User Id Auth Provider Validation Field Value {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Set User Id Auth Provider Validation Field Value</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordUpdates>
+        <description>This flow populates the combination of the local user Id and the Auth Provider API Name combination in the  User Id Auth Provider Validation Field. This is to validate the uniqueness of the user and auth provider. Each user should only have a single mapping to an Auth Provider.</description>
+        <name>Set_User_Id_Auth_Provider_Validation_Field_Value</name>
+        <label>Set User Id Auth Provider Validation Field Value</label>
+        <locationX>176</locationX>
+        <locationY>311</locationY>
+        <inputAssignments>
+            <field>User_Id_Auth_Provider_Validation__c</field>
+            <value>
+                <elementReference>User_Id_Auth_Provider_Validation</elementReference>
+            </value>
+        </inputAssignments>
+        <inputReference>$Record</inputReference>
+    </recordUpdates>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Set_User_Id_Auth_Provider_Validation_Field_Value</targetReference>
+        </connector>
+        <object>Auth_Provider_User_Mapping__c</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

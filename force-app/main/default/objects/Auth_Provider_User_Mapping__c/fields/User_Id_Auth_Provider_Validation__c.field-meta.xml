@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>User_Id_Auth_Provider_Validation__c</fullName>
+    <caseSensitive>false</caseSensitive>
+    <description>Validates that the combination of the local user Id and the Auth Provider Name is Unique. Each user should only have a single mapping to an Auth Provider.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Validates that the combination of the local user Id and the Auth Provider Name is Unique. Each user should only have a single mapping to an Auth Provider.</inlineHelpText>
+    <label>User Id Auth Provider Validation</label>
+    <length>255</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>true</unique>
+</CustomField>

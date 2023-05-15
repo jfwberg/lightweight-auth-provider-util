@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
+    <brand>
+        <headerColor>#2E0181</headerColor>
+        <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>
+    </brand>
+    <description>Map local to external users and manage (error) logs.</description>
+    <formFactors>Small</formFactors>
+    <formFactors>Large</formFactors>
+    <isNavAutoTempTabsDisabled>true</isNavAutoTempTabsDisabled>
+    <isNavPersonalizationDisabled>true</isNavPersonalizationDisabled>
+    <isNavTabPersistenceDisabled>false</isNavTabPersistenceDisabled>
+    <label>Auth Provider Util</label>
+    <navType>Standard</navType>
+    <tabs>Auth_Provider_Log__c</tabs>
+    <tabs>Auth_Provider_User_Mapping__c</tabs>
+    <uiType>Lightning</uiType>
+    <utilityBar>Auth_Provider_Util_UtilityBar</utilityBar>
+</CustomApplication>

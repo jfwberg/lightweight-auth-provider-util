@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Last_Auth_Provider_Log__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>In case a log record has been created for this user/auth provider combination, link that last log record</description>
+    <externalId>false</externalId>
+    <inlineHelpText>In case a log record has been created for this user/auth provider combination, link that last log record</inlineHelpText>
+    <label>Last Auth Provider Log</label>
+    <referenceTo>Auth_Provider_Log__c</referenceTo>
+    <relationshipLabel>Auth Provider User Mapping</relationshipLabel>
+    <relationshipName>Auth_Provider_User_Mapping</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>
