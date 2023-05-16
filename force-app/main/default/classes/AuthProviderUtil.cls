@@ -288,7 +288,8 @@ public with sharing class AuthProviderUtil {
      */
     @SuppressWarnings('PMD.OneDeclarationPerLine')
     private static void checkUserMappingUpdateAccess(){
-        // sObject Access check
+        
+		// sObject Access check
         if(!MAP_DESCRIBE_RESULT.isUpdateable()){
             throw new AuthProviderUtilException(MAP_SOBJECT_ACCESS_MSG);
         }
