@@ -13,7 +13,3 @@ You create a mapping by
 
 
 ## Security notes
-
-## Todo 
-- Add run as with permission set to the test class
-- Tabs to spaces in the test class
