@@ -4,6 +4,7 @@
         <application>Auth_Provider_Util</application>
         <visible>true</visible>
     </applicationVisibilities>
+    <description>Contains all permissions required by the Lightweight - Auth Provider Util</description>
     <fieldPermissions>
         <editable>true</editable>
         <field>Auth_Provider_Log__c.Message__c</field>
@@ -40,7 +41,16 @@
         <readable>true</readable>
     </fieldPermissions>
     <hasActivationRequired>false</hasActivationRequired>
-    <label>Auth Provider Util</label>
+    <label>Lightweight - Auth Provider Util</label>
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>false</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>Auth_Provider_Log_Event__e</object>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
     <objectPermissions>
         <allowCreate>true</allowCreate>
         <allowDelete>true</allowDelete>

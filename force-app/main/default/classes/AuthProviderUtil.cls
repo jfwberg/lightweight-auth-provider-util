@@ -1,12 +1,16 @@
 /**
- * @author      Justus van den Berg (jfwberg@gmail.com)
- * @date        May 2023
- * @copyright   (c) 2023 Justus van den Berg
- * @license     MIT (See LICENSE file in the project root)
- * @description Class containing the Auth Provider Utilities
+ * @author         Justus van den Berg (jfwberg@gmail.com)
+ * @date           May 2023
+ * @copyright      (c) 2023 Justus van den Berg
+ * @license        MIT (See LICENSE file in the project root)
+ * @description    Class containing the Auth Proivder Utilities
+ * @false-positive PMD.AvoidGlobalModifier This is a utility that is designed to be called from a
+ *                                         managed package. It can be used for a user's own custom
+ *                                         Implementation, so global is the way to open up this
+ *                                         utility for global use.
  */
-@NamespaceAccessible
-public with sharing class AuthProviderUtil {
+@SuppressWarnings('PMD.AvoidGlobalModifier')
+global with sharing class AuthProviderUtil {
 
     /** **************************************************************************************************** **
      **                                          PRIVATE VARIABLES                                           **
@@ -25,6 +29,7 @@ public with sharing class AuthProviderUtil {
     // Describe the log and mapping object
     private static final Schema.DescribeSObjectResult LOG_DESCRIBE_RESULT = Auth_Provider_Log__c.getSObjectType().getDescribe(SObjectDescribeOptions.DEFERRED);
     private static final Schema.DescribeSObjectResult MAP_DESCRIBE_RESULT = Auth_Provider_User_Mapping__c.getSObjectType().getDescribe(SObjectDescribeOptions.DEFERRED);
+    private static final Schema.DescribeSObjectResult EVT_DESCRIBE_RESULT = Auth_Provider_Log_Event__e.getSObjectType().getDescribe(SObjectDescribeOptions.DEFERRED);
 
     // Create a list of log fields with describes (these are the createable fields only)
     private static final Schema.DescribeFieldResult[] LOG_FIELD_DESCRIBE_RESULTS = new Schema.DescribeFieldResult[]{
@@ -48,6 +53,9 @@ public with sharing class AuthProviderUtil {
     // Mapping access messages
     private static final String MAP_SOBJECT_ACCESS_MSG = 'The current user is not allowed to UPDATE "Auth_Provider_User_Mapping__c" records';
     private static final String MAP_FIELD_ACCESS_MSG   = 'The current user does not have UPDATE access on the "Last_Login_Date__c","Number_of_Logins__c" and "Last_Auth_Provider_Log__c" fields on the "Auth_Provider_User_Mapping__c" sObject';
+
+    // Event access messages
+    private static final String EVT_SOBJECT_ACCESS_MSG = 'The current user is not allowed to CREATE "Auth_Provider_Log_Event__e" records';
 
     // Add validation mesages
     @TestVisible private static final String LOG_INPUT_VALIDATION_MSG  = 'The fields "Auth_Provider_Name__c", "User__c", "Log_Id__c" and  "Message__c" on the sObject "Auth_Provider_Log__c" are mandatory and cannot be blank.';
@@ -75,30 +83,29 @@ public with sharing class AuthProviderUtil {
      * @false-positive PMD.ApexCRUDViolation      The CRUD is checked with a utility method so PMD does
      *                                            not pick up on this.
      */
-    @NamespaceAccessible
     @SuppressWarnings('PMD.ExcessiveParameterList, PMD.ApexCRUDViolation')
-    public static void insertLog(String authProviderName, String userId, String logId, String message){
+    global static void insertLog(String authProviderName, String userId, String logId, String message){
         
+        // Check the current user can create Auth_Provider_Log_Event__e records
+        checkEventCreateAccess();
+
         // Validate the input values
         validateLogInput(new String[]{authProviderName,userId,logId,message});
-        
-        // Check the current user has access to insert log records
-        checkLogInsertAccess();
 
-        // Create a new record, truncate an records based on the maximum field length
-        Auth_Provider_Log__c log = new Auth_Provider_Log__c(
+        // Create a new log event and validate field lengths etc
+        // These match the lengthts in the log object, so lets use those as they are already described
+        Auth_Provider_Log_Event__e logEvent = new Auth_Provider_Log_Event__e(
             Auth_Provider_Name__c = (authProviderName.length() <= LOG_FIELD_DESCRIBE_RESULTS[0].getLength()) ? authProviderName : authProviderName.subString(0, LOG_FIELD_DESCRIBE_RESULTS[0].getLength()),
             User__c               = (userId.length()           <= LOG_FIELD_DESCRIBE_RESULTS[1].getLength()) ? userId           : userId.subString(0,           LOG_FIELD_DESCRIBE_RESULTS[1].getLength()),
             Log_Id__c             = (logId.length()            <= LOG_FIELD_DESCRIBE_RESULTS[2].getLength()) ? logId            : logId.subString(0,            LOG_FIELD_DESCRIBE_RESULTS[2].getLength()),
             Message__c            = (authProviderName.length() <= LOG_FIELD_DESCRIBE_RESULTS[3].getLength()) ? message          : message.subString(0,          LOG_FIELD_DESCRIBE_RESULTS[3].getLength())
         );
 
-        // Insert the new record
-        insert log;
-
-        // Update a related user mapping (if one exists)
-        updateRelatedUserMappingLogField(log);
+        // Publish the event
+        Eventbus.publish(logEvent);
     }
+
+
 
 
     /**
@@ -108,8 +115,7 @@ public with sharing class AuthProviderUtil {
      * @param       userId           The 18 character Id of the required user
      * @return      True if a mapping records exists, false by default
      */
-    @NamespaceAccessible
-    public static Boolean checkUserMappingExists(String authProviderName, String userId){
+    global static Boolean checkUserMappingExists(String authProviderName, String userId){
         return getUserMappingRecord(authProviderName,userId) != null;
     }
 
@@ -121,9 +127,8 @@ public with sharing class AuthProviderUtil {
      * @false-positive PMD.ApexCRUDViolation The CRUD is checked with a utility method so PMD does not
      *                                       pick up on this.
      */
-    @NamespaceAccessible
     @SuppressWarnings('PMD.ApexCRUDViolation')
-    public static void updateMappingLoginDetails(String authProviderName, String userId){
+    global static void updateMappingLoginDetails(String authProviderName, String userId){
         
         // If no mapping exists nothing has to happen
         if(!checkUserMappingExists(authProviderName,userId)){
@@ -233,6 +238,41 @@ public with sharing class AuthProviderUtil {
         }
     }
 
+    
+    /**
+     * @description    Method that insert a log record based on a platform event
+     * @param          events                        List of Auth_Provider_Log_Event__e records that
+     *                                               need to be inserted as a Auth_Provider_Log__c
+     *                                               record
+     * @false-positive PMD.ApexCRUDViolation         The CRUD is checked with a utility method so PMD
+     *                                               does not pick up on this.
+     */
+    @SuppressWarnings('PMD.ApexCRUDViolation')
+    public static void insertLogRecord(Auth_Provider_Log_Event__e[] events){
+        
+        // If there are no events for some magical reason, dont run the logic
+        if(events == null || events.isEmpty()){
+            return;
+        }
+
+        // Check the current user has access to insert log records
+        checkLogInsertAccess();
+
+        // Create a new record, input validations have been done when creating the platofrm event
+        Auth_Provider_Log__c log = new Auth_Provider_Log__c(
+            Auth_Provider_Name__c = events[0].Auth_Provider_Name__c,
+            User__c               = events[0].User__c,
+            Log_Id__c             = events[0].Log_Id__c,
+            Message__c            = events[0].Message__c
+        );
+
+        // Insert the new record
+        insert log;
+
+        // Update a related user mapping (if one exists)
+        updateRelatedUserMappingLogField(log);
+    }
+
 
     /** **************************************************************************************************** **
      **                                       PRIVATE UTILITY METHODS                                        **
@@ -289,7 +329,7 @@ public with sharing class AuthProviderUtil {
     @SuppressWarnings('PMD.OneDeclarationPerLine')
     private static void checkUserMappingUpdateAccess(){
         
-		// sObject Access check
+        // sObject Access check
         if(!MAP_DESCRIBE_RESULT.isUpdateable()){
             throw new AuthProviderUtilException(MAP_SOBJECT_ACCESS_MSG);
         }
@@ -302,6 +342,16 @@ public with sharing class AuthProviderUtil {
         }
     }
 
+
+    /**
+     * @description Method to validate that the current user can create log event records
+     */
+    private static void checkEventCreateAccess(){
+        // sObject Access check
+        if(!EVT_DESCRIBE_RESULT.isCreateable()){
+            throw new AuthProviderUtilException(EVT_SOBJECT_ACCESS_MSG);
+        }
+    }
 
     /** **************************************************************************************************** **
      **                                      PRIVATE EXCEPTION CLASSES                                       **

@@ -12,11 +12,11 @@ private with sharing class AuthProviderUtilTest {
     private static User runAsUser;
 
     // Test data values
-    private static String authProviderName    = 'myAuthProvider';
-    private static String userId            = UserInfo.getUserId();
-    private static String targetUserId        = UserInfo.getUserId().toUpperCase();
-    private static String logId                = EncodingUtil.convertToHex(Crypto.generateAESKey(128));
-    private static String message            = '(Error) Message content';
+    private static String authProviderName = 'myAuthProvider';
+    private static String userId           = UserInfo.getUserId();
+    private static String targetUserId     = UserInfo.getUserId().toUpperCase();
+    private static String logId            = EncodingUtil.convertToHex(Crypto.generateAESKey(128));
+    private static String message          = '(Error) Message content';
 
 
     /**
@@ -76,9 +76,12 @@ private with sharing class AuthProviderUtilTest {
                 logId,
                 message
             );
+			
+			// Force the platform events to be delivered
+			Test.getEventBus().deliver();
 
             // Query the user mapping, this will fail if there is no user mapping logged
-            userMapping = [    SELECT Id, Last_Auth_Provider_Log__c, Last_Login_Date__c, Number_of_Logins__c
+            userMapping = [ SELECT Id, Last_Auth_Provider_Log__c, Last_Login_Date__c, Number_of_Logins__c
                             FROM Auth_Provider_User_Mapping__c WHERE Last_Auth_Provider_Log__c != null LIMIT 1
                         ];
 
@@ -102,7 +105,7 @@ private with sharing class AuthProviderUtilTest {
 
         // Validate expected updates on the mapping record
         System.assertEquals(true , userMapping.Last_Login_Date__c    != null, 'Expected a last login date to be populated');
-        System.assertEquals(true , userMapping.Number_of_Logins__c    == 1,     'Expected number of logins to be 1');
+        System.assertEquals(true , userMapping.Number_of_Logins__c   == 1,    'Expected number of logins to be 1');
     }
 
 

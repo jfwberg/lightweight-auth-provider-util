@@ -8,14 +8,14 @@ try{
 
 	// Method to check a mapping record exists, you can throw an error before trying to fetch the
 	// token if no mapping exists.
-	Boolean mappingRecordExists = AuthProviderUtil.checkUserMappingExists(
+	Boolean mappingRecordExists = lwt.AuthProviderUtil.checkUserMappingExists(
 		authProviderName,
 		userId
 	);
 			
 			
 	// Method to insert an (error) log. Can be used for a success as well, but that should be checked in the external system
-	AuthProviderUtil.insertLog(
+	lwt.AuthProviderUtil.insertLog(
 		authProviderName,
 		userId,
 		logId,
@@ -23,7 +23,7 @@ try{
 	);
 
 	// Method to update the login details, sets the last login date and updates the counter
-	AuthProviderUtil.updateMappingLoginDetails(
+	lwt.AuthProviderUtil.updateMappingLoginDetails(
 		authProviderName,
 		userId
 	);
