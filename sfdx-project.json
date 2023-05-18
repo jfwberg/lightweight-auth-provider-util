@@ -5,8 +5,9 @@
       "default": true,
       "package": "Lightweight - Auth Provider Util",
       "versionName": "ver 0.1",
-      "versionNumber": "0.1.0.NEXT",
-      "versionDescription": "A lightweight Auth Provider Utility to add support for User Context Mapping and basic (error) logging."
+      "versionNumber": "0.2.0.NEXT",
+      "versionDescription": "A lightweight Auth Provider Utility to add support for User Context Mapping and basic (error) logging.",
+      "ancestorVersion": "0.1.0"
     }
   ],
   "name": "lightweight-auth-provider-util",
@@ -15,6 +16,7 @@
   "sourceApiVersion": "57.0",
   "packageAliases": {
     "Lightweight - Auth Provider Util": "0Ho4K0000008OYPSA2",
-    "Lightweight - Auth Provider Util@0.1.0-3": "04t4K000002JuwoQAC"
+    "Lightweight - Auth Provider Util@0.1.0-3": "04t4K000002JuwoQAC",
+    "Lightweight - Auth Provider Util@0.2.0-1": "04t4K000002JuwyQAC"
   }
 }

@@ -5,4 +5,4 @@ rem CREATE A PACKAGE VERSION - UPDATE DEVHUB
 sf package version create --package "Lightweight - Auth Provider Util" --installation-key-bypass --code-coverage --target-dev-hub  "[DEVHUB NAME]" -w 30
 
 rem PROMOTE THE PACKAGE VERSION - UPDATE NAME + DEVHUB
-sf package version promote --package "Lightweight - Auth Provider Util@0.1.0-3" --target-dev-hub  "[DEVHUB NAME]"
+sf package version promote --package "Lightweight - Auth Provider Util@0.2.0-1" --target-dev-hub  "[DEVHUB NAME]"

@@ -98,11 +98,11 @@ global with sharing class AuthProviderUtil {
             Auth_Provider_Name__c = (authProviderName.length() <= LOG_FIELD_DESCRIBE_RESULTS[0].getLength()) ? authProviderName : authProviderName.subString(0, LOG_FIELD_DESCRIBE_RESULTS[0].getLength()),
             User__c               = (userId.length()           <= LOG_FIELD_DESCRIBE_RESULTS[1].getLength()) ? userId           : userId.subString(0,           LOG_FIELD_DESCRIBE_RESULTS[1].getLength()),
             Log_Id__c             = (logId.length()            <= LOG_FIELD_DESCRIBE_RESULTS[2].getLength()) ? logId            : logId.subString(0,            LOG_FIELD_DESCRIBE_RESULTS[2].getLength()),
-            Message__c            = (authProviderName.length() <= LOG_FIELD_DESCRIBE_RESULTS[3].getLength()) ? message          : message.subString(0,          LOG_FIELD_DESCRIBE_RESULTS[3].getLength())
+            Message__c            = (message.length()          <= LOG_FIELD_DESCRIBE_RESULTS[3].getLength()) ? message          : message.subString(0,          LOG_FIELD_DESCRIBE_RESULTS[3].getLength())
         );
 
         // Publish the event
-        Eventbus.publish(logEvent);
+        Eventbus.publish(logEvent); 
     }
 
 
