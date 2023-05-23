@@ -10,7 +10,7 @@
  *                                         utility for global use.
  */
 @SuppressWarnings('PMD.AvoidGlobalModifier')
-global with sharing class AuthProviderUtil {
+global with sharing class AuthProviderUtil implements Callable{
 
     /** **************************************************************************************************** **
      **                                          PRIVATE VARIABLES                                           **
@@ -27,9 +27,10 @@ global with sharing class AuthProviderUtil {
      **                                          PRIVATE CONSTANTS                                           **
      ** **************************************************************************************************** **/
     // Describe the log and mapping object
-    private static final Schema.DescribeSObjectResult LOG_DESCRIBE_RESULT = Auth_Provider_Log__c.getSObjectType().getDescribe(SObjectDescribeOptions.DEFERRED);
-    private static final Schema.DescribeSObjectResult MAP_DESCRIBE_RESULT = Auth_Provider_User_Mapping__c.getSObjectType().getDescribe(SObjectDescribeOptions.DEFERRED);
-    private static final Schema.DescribeSObjectResult EVT_DESCRIBE_RESULT = Auth_Provider_Log_Event__e.getSObjectType().getDescribe(SObjectDescribeOptions.DEFERRED);
+    private static final Schema.DescribeSObjectResult LOG_DESCRIBE_RESULT     = Auth_Provider_Log__c.getSObjectType().getDescribe(SObjectDescribeOptions.DEFERRED);
+    private static final Schema.DescribeSObjectResult MAP_DESCRIBE_RESULT     = Auth_Provider_User_Mapping__c.getSObjectType().getDescribe(SObjectDescribeOptions.DEFERRED);
+    private static final Schema.DescribeSObjectResult LOG_EVT_DESCRIBE_RESULT = Auth_Provider_Log_Event__e.getSObjectType().getDescribe(SObjectDescribeOptions.DEFERRED);
+    private static final Schema.DescribeSObjectResult MAP_EVT_DESCRIBE_RESULT = Auth_Provider_User_Mapping_Event__e.getSObjectType().getDescribe(SObjectDescribeOptions.DEFERRED);
 
     // Create a list of log fields with describes (these are the createable fields only)
     private static final Schema.DescribeFieldResult[] LOG_FIELD_DESCRIBE_RESULTS = new Schema.DescribeFieldResult[]{
@@ -41,28 +42,74 @@ global with sharing class AuthProviderUtil {
 
     // Create a list of mapping fields with describes (these are the updateable fields only)
     private static final Schema.DescribeFieldResult[] MAP_FIELD_DESCRIBE_RESULTS = new Schema.DescribeFieldResult[]{
+        Auth_Provider_Log__c.Auth_Provider_Name__c.getDescribe(),
+        Auth_Provider_Log__c.User__c.getDescribe(),
         Auth_Provider_User_Mapping__c.Last_Auth_Provider_Log__c.getDescribe(),
         Auth_Provider_User_Mapping__c.Last_Login_Date__c.getDescribe(),
         Auth_Provider_User_Mapping__c.Number_of_Logins__c.getDescribe()
     };
 
     // Log access messages
-    private static final String LOG_SOBJECT_ACCESS_MSG = 'The current user is not allowed to CREATE "Auth_Provider_Log__c" records';
-    private static final String LOG_FIELD_ACCESS_MSG   = 'The current user does not have CREATE access on "Auth_Provider_Name__c", "User__c", "Log_Id__c" and "Message__c" fields on the "Auth_Provider_Log__c" sObject';
+    private static final String LOG_SOBJECT_ACCESS_MSG = 'The current user is not allowed to CREATE "Auth_Provider_Log__c" records.';
+    private static final String LOG_FIELD_ACCESS_MSG   = 'The current user does not have CREATE access on "Auth_Provider_Name__c", "User__c", "Log_Id__c" and "Message__c" fields on the "Auth_Provider_Log__c" sObject.';
 
     // Mapping access messages
-    private static final String MAP_SOBJECT_ACCESS_MSG = 'The current user is not allowed to UPDATE "Auth_Provider_User_Mapping__c" records';
-    private static final String MAP_FIELD_ACCESS_MSG   = 'The current user does not have UPDATE access on the "Last_Login_Date__c","Number_of_Logins__c" and "Last_Auth_Provider_Log__c" fields on the "Auth_Provider_User_Mapping__c" sObject';
+    private static final String MAP_SOBJECT_ACCESS_MSG = 'The current user is not allowed to UPDATE "Auth_Provider_User_Mapping__c" records.';
+    private static final String MAP_FIELD_ACCESS_MSG   = 'The current user does not have UPDATE access on the "Last_Login_Date__c","Number_of_Logins__c" and "Last_Auth_Provider_Log__c" fields on the "Auth_Provider_User_Mapping__c" sObject.';
 
     // Event access messages
-    private static final String EVT_SOBJECT_ACCESS_MSG = 'The current user is not allowed to CREATE "Auth_Provider_Log_Event__e" records';
+    private static final String LOG_EVT_SOBJECT_ACCESS_MSG = 'The current user is not allowed to CREATE "Auth_Provider_Log_Event__e" records.';
+    private static final String MAP_EVT_SOBJECT_ACCESS_MSG = 'The current user is not allowed to CREATE "Auth_Provider_User_Mapping_Event__e" records.';
 
     // Add validation mesages
     @TestVisible private static final String LOG_INPUT_VALIDATION_MSG  = 'The fields "Auth_Provider_Name__c", "User__c", "Log_Id__c" and  "Message__c" on the sObject "Auth_Provider_Log__c" are mandatory and cannot be blank.';
+    @TestVisible private static final String MAP_INPUT_VALIDATION_MSG  = 'The fields "Auth_Provider_Name__c" and "User__c" on the sObject "Auth_Provider_User_Mapping__c" are mandatory and cannot be blank.';
     
     // Trigger validation messages
     @TestVisible private static final String INVALID_AUTH_PROVIDER_MSG = 'The Auth Provider with DeveloperName "{0}" does not exist in the metadata. Please check your Auth Provider DeveloperName.';
-    
+
+    // Callable messages
+    @TestVisible private static final String INVALID_METHOD_CALLED_MSG = 'The method {0} does not exist on class {1}.';
+
+
+    /** **************************************************************************************************** **
+     **                                           INTERFACE METHODS                                          **
+     ** **************************************************************************************************** **/
+    global Object call(String action, Map<String, Object> args) {
+        switch on action {
+            when 'insertLog' {
+                insertLog(
+                    (String) args.get('authProviderName'),
+                    (String) args.get('userId'),
+                    (String) args.get('logId'),
+                    (String) args.get('message')
+                );
+                return null;
+            }
+            when 'checkUserMappingExists' {
+                return checkUserMappingExists(
+                    (String) args.get('authProviderName'),
+                    (String) args.get('userId')
+                );
+            }
+            when 'updateMappingLoginDetails' {
+                updateMappingLoginDetails(
+                    (String) args.get('authProviderName'),
+                    (String) args.get('userId')
+                );
+                return null;
+            }
+            when 'getSubjectFromUserMapping' {
+                return getSubjectFromUserMapping(
+                    (String) args.get('authProviderName'),
+                    (String) args.get('userId')
+                );
+            }
+            when else {
+                throw new AuthProviderUtilException(INVALID_METHOD_CALLED_MSG);
+            }
+        }
+    }
     
     /** **************************************************************************************************** **
      **                                        PUBLIC SUPPORT METHODS                                        **
@@ -87,10 +134,13 @@ global with sharing class AuthProviderUtil {
     global static void insertLog(String authProviderName, String userId, String logId, String message){
         
         // Check the current user can create Auth_Provider_Log_Event__e records
-        checkEventCreateAccess();
+        checkLogEventCreateAccess();
 
-        // Validate the input values
-        validateLogInput(new String[]{authProviderName,userId,logId,message});
+        // Validate the input values and specify the exception message to be thrown
+        validateInput(
+            new String[]{authProviderName,userId,logId,message},
+            LOG_INPUT_VALIDATION_MSG
+        );
 
         // Create a new log event and validate field lengths etc
         // These match the lengthts in the log object, so lets use those as they are already described
@@ -104,8 +154,6 @@ global with sharing class AuthProviderUtil {
         // Publish the event
         Eventbus.publish(logEvent); 
     }
-
-
 
 
     /**
@@ -130,20 +178,37 @@ global with sharing class AuthProviderUtil {
     @SuppressWarnings('PMD.ApexCRUDViolation')
     global static void updateMappingLoginDetails(String authProviderName, String userId){
         
-        // If no mapping exists nothing has to happen
-        if(!checkUserMappingExists(authProviderName,userId)){
-            return;
-        }
+        // Check the current user can create Auth_Provider_User_Mapping_Event__e records
+        checkMappingEventCreateAccess();
 
-        // Validate the user has update access
-        checkUserMappingUpdateAccess();
-        
-        // Update the last login date to now and up the number of logins by 1
-        userMapping.Last_Login_Date__c  = Datetime.now();
-        userMapping.Number_of_Logins__c = (userMapping.Number_of_Logins__c == null) ? 1 : userMapping.Number_of_Logins__c + 1;
+        // Validate the input values and specify the exception message to be thrown
+        validateInput(
+            new String[]{authProviderName,userId},
+            MAP_INPUT_VALIDATION_MSG
+        );
 
-        // Update the mapping
-        update userMapping;
+        // Validate mapping input
+        Auth_Provider_User_Mapping_Event__e mappingEvent = new Auth_Provider_User_Mapping_Event__e(
+            Auth_Provider_Name__c = (authProviderName.length() <= MAP_FIELD_DESCRIBE_RESULTS[0].getLength()) ? authProviderName : authProviderName.subString(0, MAP_FIELD_DESCRIBE_RESULTS[0].getLength()),
+            User__c               = (userId.length()           <= MAP_FIELD_DESCRIBE_RESULTS[1].getLength()) ? userId           : userId.subString(0,           MAP_FIELD_DESCRIBE_RESULTS[1].getLength())
+        );
+
+        // Publish the event
+        Eventbus.publish(mappingEvent); 
+    }
+
+
+    /**
+     * @description Method that returns the contents of the Target_User_Identifier__c field from the
+     *              user mapping record that matches the Auth Provider and User Id combination.
+     *              If there is no mapping null will be returned. This should be used together with the
+     *              check credentials exists method.
+     * @param       authProviderName The DeveloperName of the auth provider
+     * @param       userId           The 18 character Id of the required user
+     * @return      Target_User_Identifier__c value from the related mapping record
+     */
+    global static String getSubjectFromUserMapping(String authProviderName, String userId){
+        return getUserMappingRecord(authProviderName,userId)?.Target_User_Identifier__c;
     }
 
 
@@ -163,7 +228,7 @@ global with sharing class AuthProviderUtil {
             
             // Query the relatd user mapping, the combination of 
             Auth_Provider_User_Mapping__c[] userMappings = [
-                SELECT Id, Number_of_Logins__c FROM Auth_Provider_User_Mapping__c
+                SELECT Id, Number_of_Logins__c, Target_User_Identifier__c FROM Auth_Provider_User_Mapping__c
                 WHERE User__c = :userId AND Auth_Provider_Name__c = :authProviderName
                 WITH SECURITY_ENFORCED LIMIT 1
             ];
@@ -238,7 +303,36 @@ global with sharing class AuthProviderUtil {
         }
     }
 
-    
+
+    /**
+     * @description Method that updates the owner field based on a different field on the sObject
+     * @param       sObjectField The SObjectField object that needs to be referenced
+     * @param       records      A list of SObject records
+     */
+    public static void updateOwner(SObjectField sObjectField, SObject[] records){
+        for(SObject record : records){
+            record.put('OwnerId', (Id) record.get(String.valueOf(sObjectField)));
+        }
+    }
+
+
+    /**
+     * @description Method to concatenate multiple fields into a single field to generate a unique
+     *              combined valued
+     * @param       concatFields The fields to concatenate
+     * @param       targetField  The target field to apply the value to
+     * @param       records      A list of SObject records
+     */
+    public static void updateUniqueValidation(SObjectField[] concatFields, SObjectField targetField, SObject[] records){
+        for(SObject record : records){
+            record.put(
+                String.valueOf(targetField),
+                record.get(String.valueOf(concatFields[0])) + '_' + record.get(String.valueOf(concatFields[1]))
+            );
+        }
+    }
+
+
     /**
      * @description    Method that insert a log record based on a platform event
      * @param          events                        List of Auth_Provider_Log_Event__e records that
@@ -274,22 +368,51 @@ global with sharing class AuthProviderUtil {
     }
 
 
+    /**
+     * @description Method that updates a user mapping record based on a platform event
+     * @param       events List of Auth_Provider_User_Mapping_Event__e records that need to be updated
+     */
+    public static void updateMappingRecord (Auth_Provider_User_Mapping_Event__e[] events){
+        
+        // If there are no events for some magical reason, dont run the logic
+        if(events == null || events.isEmpty()){
+            return;
+        }
+
+        // If no mapping exists nothing has to happen
+        if(!checkUserMappingExists(events[0].Auth_Provider_Name__c, events[0].User__c)){
+            return;
+        }
+
+        // Validate the user has update access
+        checkUserMappingUpdateAccess();
+        
+        // Update the last login date to now and up the number of logins by 1
+        userMapping.Last_Login_Date__c  = Datetime.now();
+        userMapping.Number_of_Logins__c = (userMapping.Number_of_Logins__c == null) ? 1 : userMapping.Number_of_Logins__c + 1;
+
+        // Update the mapping
+        update userMapping;
+    }
+
+
     /** **************************************************************************************************** **
      **                                       PRIVATE UTILITY METHODS                                        **
      ** **************************************************************************************************** **/
     /**
      * @description    Method to validate empty input values when creating the log
      * @param          inputs                    The list of strings to validate if they are blank
+     * @param          exceptionMessage          The exception message that will be shown to the user
      * @throws         AuthProviderUtilException Any input that is check is blank (null or empty)
      * @false-positive PMD.OneDeclarationPerLine This is a declaration inside a for loop for
      *                                           optimization. This is still easily readable and has no
      *                                           big impact
      */
     @SuppressWarnings('PMD.OneDeclarationPerLine')
-    private static void validateLogInput(String[] inputs){
+    private static void validateInput(String[] inputs, String exceptionMessage){
         for(Integer i=0, max=inputs.size();i<max;i++){
             if(String.isBlank(inputs[i])){
-                throw new AuthProviderUtilException(LOG_INPUT_VALIDATION_MSG);
+                throw new AuthProviderUtilException(exceptionMessage);
             }
         }
     }
@@ -346,12 +469,24 @@ global with sharing class AuthProviderUtil {
     /**
      * @description Method to validate that the current user can create log event records
      */
-    private static void checkEventCreateAccess(){
+    private static void checkLogEventCreateAccess(){
         // sObject Access check
-        if(!EVT_DESCRIBE_RESULT.isCreateable()){
-            throw new AuthProviderUtilException(EVT_SOBJECT_ACCESS_MSG);
+        if(!LOG_EVT_DESCRIBE_RESULT.isCreateable()){
+            throw new AuthProviderUtilException(LOG_EVT_SOBJECT_ACCESS_MSG);
         }
     }
+
+
+    /**
+     * @description Method to check if the current user can create user mapping event records
+     */
+    private static void checkMappingEventCreateAccess(){
+        // sObject Access check
+        if(!MAP_EVT_DESCRIBE_RESULT.isCreateable()){
+            throw new AuthProviderUtilException(MAP_EVT_SOBJECT_ACCESS_MSG);
+        }
+    }
+
 
     /** **************************************************************************************************** **
      **                                      PRIVATE EXCEPTION CLASSES                                       **
@@ -359,5 +494,6 @@ global with sharing class AuthProviderUtil {
     /**
      * @description Custom Exception thrown when there is an issue with any of the utilities
      */
+    @TestVisible
     private class AuthProviderUtilException extends Exception{}
 }

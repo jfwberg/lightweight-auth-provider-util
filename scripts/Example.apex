@@ -28,6 +28,12 @@ try{
 		userId
 	);
 
+	// Method to get the subject from a a mapping
+	String subject = lwt.AuthProviderUtil.getSubjectFromUserMapping(
+		authProviderName,
+		String userId
+	);
+
 }catch(Exception e){
 	System.debug(e.getMessage());
 }
