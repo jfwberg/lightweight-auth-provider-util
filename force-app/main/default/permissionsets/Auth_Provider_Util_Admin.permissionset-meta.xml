@@ -25,6 +25,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>Auth_Provider_User_Mapping__c.Auth_Provider_User_Id_Validation__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>Auth_Provider_User_Mapping__c.Last_Auth_Provider_Log__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -36,11 +41,6 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Auth_Provider_User_Mapping__c.Number_of_Logins__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Auth_Provider_User_Mapping__c.Auth_Provider_User_Id_Validation__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -85,6 +85,15 @@
         <modifyAllRecords>true</modifyAllRecords>
         <object>Auth_Provider_User_Mapping__c</object>
         <viewAllRecords>true</viewAllRecords>
+    </objectPermissions>
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>true</allowDelete>
+        <allowEdit>true</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>UserExternalCredential</object>
+        <viewAllRecords>false</viewAllRecords>
     </objectPermissions>
     <tabSettings>
         <tab>Auth_Provider_Log__c</tab>

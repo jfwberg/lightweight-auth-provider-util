@@ -4,9 +4,10 @@
       "path": "force-app",
       "default": true,
       "package": "Lightweight - Auth Provider Util v2",
-      "versionName": "ver 0.1",
-      "versionNumber": "0.1.0.NEXT",
-      "versionDescription": "A lightweight Auth Provider Utility to add support for User Context Mapping and basic (error) logging."
+      "versionName": "Version 0.3",
+      "versionNumber": "0.3.0.NEXT",
+      "versionDescription": "A lightweight Auth Provider Utility to add support for User Context Mapping and basic (error) logging.",
+      "ancestorVersion": "0.2.0"
     }
   ],
   "name": "lightweight-auth-provider-util",
@@ -15,6 +16,8 @@
   "sourceApiVersion": "57.0",
   "packageAliases": {
     "Lightweight - Auth Provider Util v2": "0Ho4K0000008OYUSA2",
-    "Lightweight - Auth Provider Util v2@0.1.0-1": "04t4K000002JuxSQAS"
+    "Lightweight - Auth Provider Util v2@0.1.0-1": "04t4K000002JuxSQAS",
+    "Lightweight - Auth Provider Util v2@0.2.0-1": "04t4K000002JuyzQAC",
+    "Lightweight - Auth Provider Util v2@0.3.0-1": "04t4K000002Jv1tQAC"
   }
 }

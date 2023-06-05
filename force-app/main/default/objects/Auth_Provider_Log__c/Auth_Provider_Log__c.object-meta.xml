@@ -168,6 +168,6 @@
     </nameField>
     <pluralLabel>Auth Provider Log</pluralLabel>
     <searchLayouts></searchLayouts>
-    <sharingModel>ReadWrite</sharingModel>
+    <sharingModel>Private</sharingModel>
     <visibility>Public</visibility>
 </CustomObject>

@@ -3,3 +3,4 @@ call sfdx scanner:run -t "C:/VSCode Projects/auth-provider-util/force-app" -f ht
 
 rem SECURITY SCAN - GRAPH RULES
 call sfdx scanner:run:dfa -t "force-app/main/default/classes/*.cls" -p "C:/VSCode Projects/auth-provider-util" -f html -o "scan-results/graph-result.html" --verbose
+ 

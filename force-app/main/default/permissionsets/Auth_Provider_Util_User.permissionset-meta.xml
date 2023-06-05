@@ -7,6 +7,11 @@
     <description>Holds the end user related access for the &quot;Lightweight - Auth Provider Util&quot; package</description>
     <fieldPermissions>
         <editable>false</editable>
+        <field>Auth_Provider_User_Mapping__c.Auth_Provider_User_Id_Validation__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>Auth_Provider_User_Mapping__c.Last_Auth_Provider_Log__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -18,11 +23,6 @@
     <fieldPermissions>
         <editable>false</editable>
         <field>Auth_Provider_User_Mapping__c.Number_of_Logins__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>Auth_Provider_User_Mapping__c.Auth_Provider_User_Id_Validation__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -57,6 +57,15 @@
         <allowRead>true</allowRead>
         <modifyAllRecords>false</modifyAllRecords>
         <object>Auth_Provider_User_Mapping__c</object>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>true</allowDelete>
+        <allowEdit>true</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>UserExternalCredential</object>
         <viewAllRecords>false</viewAllRecords>
     </objectPermissions>
 </PermissionSet>
