@@ -4,16 +4,16 @@
       "path": "force-app",
       "default": true,
       "package": "Lightweight - Auth Provider Util v2",
-      "versionName": "Version 0.3",
-      "versionNumber": "0.3.0.NEXT",
+      "versionName": "v59.0 - 0.1",
+      "versionNumber": "0.4.0.NEXT",
       "versionDescription": "A lightweight Auth Provider Utility to add support for User Context Mapping and basic (error) logging.",
-      "ancestorVersion": "0.2.0"
+      "ancestorVersion": "0.3.0"
     }
   ],
   "name": "lightweight-auth-provider-util",
   "namespace": "lwt",
   "sfdcLoginUrl": "https://login.salesforce.com",
-  "sourceApiVersion": "57.0",
+  "sourceApiVersion": "59.0",
   "packageAliases": {
     "Lightweight - Auth Provider Util v2": "0Ho4K0000008OYUSA2",
     "Lightweight - Auth Provider Util v2@0.1.0-1": "04t4K000002JuxSQAS",
