@@ -13,9 +13,9 @@ There are also two platform event objects because Auth Providers cannot use DML,
 | Package Info | Value |
 |---|---|
 |Name|Lightweight - Auth Provider Util v2|
-|Version|0.3.0-1|
-|Installation URL| */packaging/installPackage.apexp?p0=04t4K000002Jv1tQAC*
-|GIT URL|https://github.com/jfwberg/auth-provider-util.git|
+|Version|0.4.0-1|
+|Installation URL| */packaging/installPackage.apexp?p0=04tP30000006yO5IAI*
+|GIT URL|https://github.com/jfwberg/lightweight-auth-provider-util.git|
 
 ## Implementation example
 An example (de-coupled) implementation can be found tine the Lightweight - OAuth 2.0 JWT Client Credentials Auth Provider Repo

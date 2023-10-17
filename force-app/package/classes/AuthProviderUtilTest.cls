@@ -4,13 +4,15 @@
  * @copyright   (c) 2023 Justus van den Berg
  * @license     MIT (See LICENSE file in the project root)
  * @description Class containing the Auth Provider Utilities Test Methods
+ * @note        Suppress assert warnings as assert is done in a utility, so false-positive
  */
 @IsTest
+@SuppressWarnings('PMD.ApexUnitTestClassShouldHaveAsserts')
 private with sharing class AuthProviderUtilTest {
     
     // User for the running the tests
-    private static final User ADMIN_USER = createRunAsUser('Auth_Provider_Util_Admin');
-    private static final User END_USER   = createRunAsUser('Auth_Provider_Util_User');
+    private static final User ADMIN_USER = utl.Tst.createRunAsUser(utl.Tst.MINIMUM_ACCESS_PROFILE, 'Auth_Provider_Util_Admin');
+    private static final User END_USER   = utl.Tst.createRunAsUser(utl.Tst.MINIMUM_ACCESS_PROFILE, 'Auth_Provider_Util_User');
 
     // Test data values
     private static String authProviderName = 'myAuthProvider';
@@ -44,7 +46,7 @@ private with sharing class AuthProviderUtilTest {
         Test.stopTest();
 
         // Assert the new log is inserted
-        System.assertEquals(
+        Assert.areEqual(
             1,
             [SELECT COUNT() FROM Auth_Provider_Log__c],
             'Expected a single log record'
@@ -71,7 +73,7 @@ private with sharing class AuthProviderUtilTest {
             insert userMapping;
 
             // Test the get subject method
-            System.assertEquals(
+            Assert.areEqual(
                 targetUserId,
                 AuthProviderUtil.getSubjectFromUserMapping(authProviderName, userId),
                 'Unexpected target user identifier received'
@@ -94,9 +96,9 @@ private with sharing class AuthProviderUtilTest {
                         ];
 
             // Validate expected updates on the mapping record
-            System.assertEquals(true, userMapping.Last_Auth_Provider_Log__c != null,'Expected no auth provider log');
-            System.assertEquals(true, userMapping.Last_Login_Date__c        == null,'Expected no last login date to be populated');
-            System.assertEquals(true, userMapping.Number_of_Logins__c       == 0,   'Expected number of logins to be 0');
+            Assert.areEqual(true, userMapping.Last_Auth_Provider_Log__c != null,'Expected no auth provider log');
+            Assert.areEqual(true, userMapping.Last_Login_Date__c        == null,'Expected no last login date to be populated');
+            Assert.areEqual(true, userMapping.Number_of_Logins__c       == 0,   'Expected number of logins to be 0');
             
             // Update the mapping details on the user mapping record
             AuthProviderUtil.updateMappingLoginDetails(
@@ -112,8 +114,8 @@ private with sharing class AuthProviderUtilTest {
         ];
 
         // Validate expected updates on the mapping record
-        System.assertEquals(true , userMapping.Last_Login_Date__c    != null, 'Expected a last login date to be populated');
-        System.assertEquals(true , userMapping.Number_of_Logins__c   == 1,    'Expected number of logins to be 1');
+        Assert.areEqual(true , userMapping.Last_Login_Date__c    != null, 'Expected a last login date to be populated');
+        Assert.areEqual(true , userMapping.Number_of_Logins__c   == 1,    'Expected number of logins to be 1');
     }
 
 
@@ -133,15 +135,8 @@ private with sharing class AuthProviderUtilTest {
                 new SObject[]{new Auth_Provider_Log__c(Auth_Provider_Name__c = 'randomValueHereXYZ')}
             );
         }catch(Exception e){
-            // Validate the exception message
-            System.assertEquals(
-                String.format(
-                    AuthProviderUtil.INVALID_AUTH_PROVIDER_MSG,
-                    new String[]{'randomValueHereXYZ'}
-                ),
-                e.getMessage(),
-                'Unexpected validation message'
-            );
+            // Validate Exception message
+            utl.Tst.assertExceptionMessage(AuthProviderUtil.LOG_INPUT_VALIDATION_MSG, 'randomValueHereXYZ', e);
         }
     }
 
@@ -156,12 +151,8 @@ private with sharing class AuthProviderUtilTest {
             try{
                 AuthProviderUtil.insertLog(null,null,null,null);
             }catch(Exception e){
-                // Validate the exception message
-                System.assertEquals(
-                    AuthProviderUtil.LOG_INPUT_VALIDATION_MSG,
-                    e.getMessage(),
-                    'Unexpected validation message'
-                );
+                // Validate Exception message
+                utl.Tst.assertExceptionMessage(AuthProviderUtil.LOG_INPUT_VALIDATION_MSG, e);
             }
         }
         Test.stopTest();
@@ -187,14 +178,14 @@ private with sharing class AuthProviderUtilTest {
             insert userMapping;
 
             // Validate the owner has changed accordingly
-            System.assertEquals(
+            Assert.areEqual(
                 END_USER.Id,
                 [SELECT OwnerId FROM Auth_Provider_User_Mapping__c WHERE Id = :userMapping.Id LIMIT 1].OwnerId,
                 'Unexpected OwnerId'
             );
 
             // Validate the owner has changed accordingly
-            System.assertEquals(
+            Assert.areEqual(
                 authProviderName + '_' + userId,
                 [SELECT Auth_Provider_User_Id_Validation__c FROM Auth_Provider_User_Mapping__c WHERE Id = :userMapping.Id LIMIT 1].Auth_Provider_User_Id_Validation__c,
                 'Unexpected validation field value'
@@ -215,7 +206,7 @@ private with sharing class AuthProviderUtilTest {
                 'logId'            => logId,
                 'message'          => message
             });
-            System.assertEquals(null, insertLogResult,'Expected a void to return null');
+            Assert.areEqual(null, insertLogResult,'Expected a void to return null');
 
 
             // Test checkUserMappingExistsResult
@@ -224,7 +215,7 @@ private with sharing class AuthProviderUtilTest {
                 'authProviderName' => authProviderName,
                 'userId'           => userId
             });
-            System.assertEquals(true, checkUserMappingExistsResult,'Expected the user mapping to exist');
+            Assert.areEqual(true, checkUserMappingExistsResult,'Expected the user mapping to exist');
 
 
             // Test updateMappingLoginDetails
@@ -233,7 +224,7 @@ private with sharing class AuthProviderUtilTest {
                 'authProviderName' => authProviderName,
                 'userId'           => userId
             });
-            System.assertEquals(null, updateMappingLoginDetailsResult,'Expected the a void to return null');
+            Assert.areEqual(null, updateMappingLoginDetailsResult,'Expected the a void to return null');
             
 
             // Test getSubjectFromUserMapping
@@ -242,71 +233,21 @@ private with sharing class AuthProviderUtilTest {
                 'authProviderName' => authProviderName,
                 'userId'           => userId
             });
-            System.assertEquals(targetUserId, getSubjectFromUserMappingResult,'Unexpected target Id');
+            Assert.areEqual(targetUserId, getSubjectFromUserMappingResult,'Unexpected target Id');
 
 
-            // Test the exception
             try{
+                // Test the exception
                 extension.call('invalid method',null);
-                throw new StringException('This part should not be reached');
-            }catch(AuthProviderUtil.AuthProviderUtilException e){
-                System.assertEquals(
-                    AuthProviderUtil.INVALID_METHOD_CALLED_MSG,
-                    e.getMessage(),
-                    'Unexpected Exception message'
-                );
-            }
+                
+                // This method will fail the test as it should not be reached
+                utl.Tst.assertExceptionHasBeenThrow();
 
+            }catch(AuthProviderUtil.AuthProviderUtilException e){
+                // Validate Exception message
+                utl.Tst.assertExceptionMessage(AuthProviderUtil.INVALID_METHOD_CALLED_MSG, e);
+            }
         }
         Test.stopTest();
-    }
-
-
-    /**
-     * @description Method to create a run as user with a permission set
-     * @param       permissionSetName The (api) name of the Permission Set
-     * @return      A User record that can be used with the runAs() function
-     */
-    private static User createRunAsUser(String permissionSetName){
-
-        // Create a new user
-        User runAsUser = new User();
-
-        // Query profile Id
-        String profileId = [SELECT Id FROM Profile WHERE Name = 'Minimum Access - Salesforce' WITH SECURITY_ENFORCED LIMIT 1]?.Id;
-
-        // Create a random username
-        String username = EncodingUtil.convertToHex(Crypto.generateAESKey(128)) + '@' + EncodingUtil.convertToHex(Crypto.generateAESKey(128)) +'.com.invalid';
-    
-        // Setup a user, so you can run the test code for a specific profile / permission set
-        runAsUser.Alias             = userName.subString(0,8);
-        runAsUser.UserName          = userName;
-        runAsUser.Email             = userName;
-        runAsUser.FirstName         = 'Apex Test';
-        runAsUser.LastName          = 'Temporary User';
-        runAsUser.EmailEncodingKey  = 'UTF-8';
-        runAsUser.LanguageLocaleKey = 'en_US';
-        runAsUser.LocaleSidKey      = 'en_US';
-        runAsUser.TimeZoneSidKey    = 'Europe/London';
-        runAsUser.ProfileId         = profileId;
-        runAsUser.IsActive          = true;
-        
-        // Insert the user
-        insert runAsUser;
-        
-        // Create a permission set
-        if(String.isNotBlank(permissionSetName)){
-            // Query permission sets and, if permission set value equals null do not query but just get a new list
-            PermissionSet permissionSet = [SELECT Id FROM PermissionSet WHERE Name = :permissionSetName WITH SECURITY_ENFORCED LIMIT 1 ];
-
-            // Create the permission set Id
-            insert new PermissionSetAssignment(
-                AssigneeId      = runAsUser.Id,
-                PermissionSetId = permissionSet.Id
-            );
-        }
-        
-        // Return the new user
-        return runAsUser;
     }
 }
