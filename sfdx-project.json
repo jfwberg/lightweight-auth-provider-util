@@ -1,31 +1,31 @@
 {
-  "packageDirectories": [
-    {
-      "path": "force-app/package",
-      "default": true,
-      "package": "Lightweight - Auth Provider Util v2",
-      "versionName": "v59.0 - 0.1",
-      "versionNumber": "0.4.0.NEXT",
-      "versionDescription": "A lightweight Auth Provider Utility to add support for User Context Mapping and basic (error) logging.",
-      "ancestorVersion": "0.3.0",
-      "dependencies": [
+    "packageDirectories": [
         {
-          "package": "Lightweight - Apex Unit Test Util v2@2.1.0-2"
+            "path": "force-app/package",
+            "default": true,
+            "package": "Lightweight - Auth Provider Util v2",
+            "versionName": "v59.0 - 0.1",
+            "versionNumber": "0.4.0.NEXT",
+            "versionDescription": "A lightweight Auth Provider Utility to add support for User Context Mapping and basic (error) logging.",
+            "ancestorVersion": "0.3.0",
+            "dependencies": [
+                {
+                    "package": "Lightweight - Apex Unit Test Util v2@2.1.0-2"
+                }
+            ]
         }
-      ]
+    ],
+    "name": "lightweight-auth-provider-util",
+    "namespace": "lwt",
+    "sfdcLoginUrl": "https://login.salesforce.com",
+    "sourceApiVersion": "59.0",
+    "packageAliases": {
+        "Lightweight - Apex Unit Test Util v2@2.1.0-2": "04tP30000006pflIAA",
+        "Lightweight - Apex Unit Test Util v2 (Unlocked)@2.1.0-2": "04tP30000006pUUIAY",
+        "Lightweight - Auth Provider Util v2": "0Ho4K0000008OYUSA2",
+        "Lightweight - Auth Provider Util v2@0.1.0-1": "04t4K000002JuxSQAS",
+        "Lightweight - Auth Provider Util v2@0.2.0-1": "04t4K000002JuyzQAC",
+        "Lightweight - Auth Provider Util v2@0.3.0-1": "04t4K000002Jv1tQAC",
+        "Lightweight - Auth Provider Util v2@0.4.0-1": "04tP30000006yO5IAI"
     }
-  ],
-  "name": "lightweight-auth-provider-util",
-  "namespace": "lwt",
-  "sfdcLoginUrl": "https://login.salesforce.com",
-  "sourceApiVersion": "59.0",
-  "packageAliases": {
-    "Lightweight - Apex Unit Test Util v2@2.1.0-2": "04tP30000006pflIAA",
-    "Lightweight - Apex Unit Test Util v2 (Unlocked)@2.1.0-2": "04tP30000006pUUIAY",
-    "Lightweight - Auth Provider Util v2": "0Ho4K0000008OYUSA2",
-    "Lightweight - Auth Provider Util v2@0.1.0-1": "04t4K000002JuxSQAS",
-    "Lightweight - Auth Provider Util v2@0.2.0-1": "04t4K000002JuyzQAC",
-    "Lightweight - Auth Provider Util v2@0.3.0-1": "04t4K000002Jv1tQAC",
-    "Lightweight - Auth Provider Util v2@0.4.0-1": "04tP30000006yO5IAI"
-  }
 }

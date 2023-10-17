@@ -9,7 +9,17 @@ The utility consists of an App called "Auth Provider Util" and two sObjects: "Au
 
 There are also two platform event objects because Auth Providers cannot use DML, so we use a platform event with a trigger to create logging records and update the login information.
 
-## Package Info
+## Dependency - Package Info
+The following package need to be installed first before installing this package.
+If you use the *managed package* you need to installed the managed package dependency and if you use the *unlocked version* you need to use the unlocked dependency.
+| Info | Value |
+|---|---|
+|Name|Lightweight - Apex Unit Test Util v2|
+|Version|2.1.0-2|
+|Managed Installation URL | */packaging/installPackage.apexp?p0=04tP30000006pflIAA*
+|Unlocked Installation URL| */packaging/installPackage.apexp?p0=04tP30000006pUUIAY*
+
+## Auth Provider Util v2 - Package Info
 | Package Info | Value |
 |---|---|
 |Name|Lightweight - Auth Provider Util v2|
@@ -18,8 +28,11 @@ There are also two platform event objects because Auth Providers cannot use DML,
 |GIT URL|https://github.com/jfwberg/lightweight-auth-provider-util.git|
 
 ## Implementation example
-An example (de-coupled) implementation can be found tine the Lightweight - OAuth 2.0 JWT Client Credentials Auth Provider Repo
-https://github.com/jfwberg/OAuthJwtClientCredentials
+An example (de-coupled) implementation can be found in the Lightweight - OAuth 2.0 JWT Client Credentials Auth Provider Repo
+https://github.com/jfwberg/lightweight-oauth-jwt-client-credentials-auth-provider
+
+Another example can be found in the Lightweight - Data Cloud Auth Provider Repo
+https://github.com/jfwberg/lightweight-data-cloud-auth-provider
 
 ## User Mapping
 User mappings allow you to create a "Per User Principal" integration with a custom Auth Provider in combination with Named/External credentials.
