@@ -15,17 +15,18 @@ If you use the *managed package* you need to installed the managed package depen
 | Info | Value |
 |---|---|
 |Name|Lightweight - Apex Unit Test Util v2|
-|Version|2.1.0-2|
-|Managed Installation URL | */packaging/installPackage.apexp?p0=04tP30000006pflIAA*
-|Unlocked Installation URL| */packaging/installPackage.apexp?p0=04tP30000006pUUIAY*
+|Version|2.2.0-2|
+|Managed Installation URL | */packaging/installPackage.apexp?p0=04tP30000007Ez7IAE*
+|Unlocked Installation URL| */packaging/installPackage.apexp?p0=04tP30000007F3xIAE*
 
 ## Auth Provider Util v2 - Package Info
 | Package Info | Value |
 |---|---|
 |Name|Lightweight - Auth Provider Util v2|
-|Version|0.4.0-1|
-|Installation URL| */packaging/installPackage.apexp?p0=04tP30000006yO5IAI*
-|GIT URL|https://github.com/jfwberg/lightweight-auth-provider-util.git|
+|Version|0.5.0-1|
+|Managed Installation URL | */packaging/installPackage.apexp?p0=04tP30000007GUfIAM*
+|Unlocked Installation URL| */packaging/installPackage.apexp?p0=04tP30000007GXtIAM*
+
 
 ## Implementation example
 An example (de-coupled) implementation can be found in the Lightweight - OAuth 2.0 JWT Client Credentials Auth Provider Repo
