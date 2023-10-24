@@ -4,13 +4,13 @@
             "path": "force-app/package",
             "default": true,
             "package": "Lightweight - Auth Provider Util v2",
-            "versionName": "v59.0 - 0.2",
-            "versionNumber": "0.5.0.NEXT",
+            "versionName": "v59.0 - 0.3",
+            "versionNumber": "0.6.0.NEXT",
             "versionDescription": "A lightweight Auth Provider Utility to add support for User Context Mapping and basic (error) logging.",
-            "ancestorVersion": "0.4.0",
+            "ancestorVersion": "0.5.0",
             "dependencies": [
                 {
-                    "package": "Lightweight - Apex Unit Test Util v2@2.2.0-2"
+                    "package": "Lightweight - Apex Unit Test Util v2@2.3.0-2"
                 }
             ]
         },
@@ -18,12 +18,12 @@
             "path": "force-app/package",
             "default": false,
             "package": "Lightweight - Auth Provider Util v2 (Unlocked)",
-            "versionName": "ver 0.1",
-            "versionNumber": "0.1.0.NEXT",
+            "versionName": "v59.0 - 0.3",
+            "versionNumber": "0.6.0.NEXT",
             "versionDescription": "A lightweight Auth Provider Utility to add support for User Context Mapping and basic (error) logging.",
             "dependencies": [
                 {
-                    "package": "Lightweight - Apex Unit Test Util v2 (Unlocked)@2.2.0-2"
+                    "package": "Lightweight - Apex Unit Test Util v2 (Unlocked)@2.3.0-2"
                 }
             ]
         }
@@ -33,15 +33,17 @@
     "sfdcLoginUrl": "https://login.salesforce.com",
     "sourceApiVersion": "59.0",
     "packageAliases": {
-        "Lightweight - Apex Unit Test Util v2@2.2.0-2": "04tP30000007Ez7IAE",
-        "Lightweight - Apex Unit Test Util v2 (Unlocked)@2.2.0-2": "04tP30000007F3xIAE",
+        "Lightweight - Apex Unit Test Util v2@2.3.0-2": "04tP30000007oePIAQ",
+        "Lightweight - Apex Unit Test Util v2 (Unlocked)@2.3.0-2": "04tP30000007og1IAA",
         "Lightweight - Auth Provider Util v2": "0Ho4K0000008OYUSA2",
         "Lightweight - Auth Provider Util v2@0.1.0-1": "04t4K000002JuxSQAS",
         "Lightweight - Auth Provider Util v2@0.2.0-1": "04t4K000002JuyzQAC",
         "Lightweight - Auth Provider Util v2@0.3.0-1": "04t4K000002Jv1tQAC",
         "Lightweight - Auth Provider Util v2@0.4.0-1": "04tP30000006yO5IAI",
         "Lightweight - Auth Provider Util v2@0.5.0-1": "04tP30000007GUfIAM",
+        "Lightweight - Auth Provider Util v2@0.6.0-1": "04tP30000007t1NIAQ",
         "Lightweight - Auth Provider Util v2 (Unlocked)": "0HoP30000000085KAA",
-        "Lightweight - Auth Provider Util v2 (Unlocked)@0.1.0-1": "04tP30000007GXtIAM"
+        "Lightweight - Auth Provider Util v2 (Unlocked)@0.1.0-1": "04tP30000007GXtIAM",
+        "Lightweight - Auth Provider Util v2 (Unlocked)@0.6.0-1": "04tP30000007tB3IAI"
     }
 }

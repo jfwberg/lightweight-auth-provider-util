@@ -11,8 +11,8 @@
 private with sharing class AuthProviderUtilTest {
     
     // User for the running the tests
-    private static final User ADMIN_USER = utl.Tst.createRunAsUser(utl.Tst.MINIMUM_ACCESS_PROFILE, 'Auth_Provider_Util_Admin');
-    private static final User END_USER   = utl.Tst.createRunAsUser(utl.Tst.MINIMUM_ACCESS_PROFILE, 'Auth_Provider_Util_User');
+    private static final User ADMIN_USER = utl.Tst.createRunAsUser(utl.Tst.MINIMUM_ACCESS_PROFILE, 'Lightweight_Auth_Provider_Util_Admin');
+    private static final User END_USER   = utl.Tst.createRunAsUser(utl.Tst.MINIMUM_ACCESS_PROFILE, 'Lightweight_Auth_Provider_Util_User');
 
     // Test data values
     private static String authProviderName = 'myAuthProvider';
