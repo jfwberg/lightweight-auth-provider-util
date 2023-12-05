@@ -141,6 +141,34 @@ private with sharing class AuthProviderUtilTest {
     }
 
 
+    
+    /**
+     * @description Method to get the user id and the session data from cookies
+     */
+    @SuppressWarnings('PMD.AvoidHardcodingId')
+    @IsTest
+    static void testGetAuthUserDataFromCookieHeader(){
+        
+        // Data to validate
+        Auth.UserData data;
+
+        // Execute the test
+        Test.startTest();
+        System.runAs(ADMIN_USER){
+            // Create the mock response
+            utl.Mck.setResponse('{"active": true, "email": "henk@devries.nl", "email_verified": true, "family_name": "de Vries", "given_name": "Henk", "is_app_installed": true, "is_salesforce_integration_user": false, "locale": "en_GB", "name": "Henk de Vries", "preferred_username": "henk@devries.nl", "profile": "#", "user_id": "0058d0000050rYpAAI", "user_type": "STANDARD", "utcOffset": 0, "zoneinfo": "Europe/London"}');
+            
+            // Execute logic
+            data = AuthProviderUtil.getAuthUserDataFromCookieHeader('BrowserId=JrIF-JNyEe6Z1ZuCfDCB4w; BrowserId_sec=JrIF-JNyEe6Z1ZuCfDCB4w; sfdcConsent=1; CookieConsentPolicy=0:1; LSKey-c$CookieConsentPolicy=0:1; webact=%7B%22l_vdays%22%3A-1%2C%22l_visit%22%3A0%2C%22session%22%3A1701782904312%2C%22l_search%22%3A%22%22%2C%22l_dtype%22%3A%22SFDC%20Network%22%2C%22l_page%22%3A%22SFDC%3Aus%3Alogin%22%2C%22l_page_url%22%3A%22https%3A%2F%2Fc.salesforce.com%2Flogin-messages%2Fpromos.html%22%2C%22counter%22%3A0%2C%22pv%22%3A2%2C%22f_visit%22%3A1701782898284%2C%22seg%22%3A%22non-customer%3Aus%22%2C%22d%22%3A%2270130000000sUW0%22%7D; OptanonConsent=isGpcEnabled=0&datestamp=Tue+Dec+05+2023+13%3A28%3A24+GMT%2B0000+(Greenwich+Mean+Time)&version=202306.1.0&browserGpcFlag=0&isIABGlobal=false&hosts=&consentId=924e06fd-9173-487d-983d-601ba5903d80&interactionCount=1&landingPath=https%3A%2F%2Fc.salesforce.com%2Flogin-messages%2Fpromos.html&groups=1%3A1%2C3%3A0%2C2%3A0%2C4%3A0; inst=APP_Pv; rememberUn=false; com.salesforce.LocaleInfo=uk; oinfo=c3RhdHVzPVRSSUFMJnR5cGU9MyZvaWQ9MDBEUHYwMDAwMDBmdVhp; sfdc_lv2=KxG83HXUehD4n5M2wLsGr31CR3XUwK0AXt7PTdZyIRS6VZfF6pOuJeV85OdArj90o=; disco=Pv:00DPv000000fuXi:005Pv000001MB5t:6; autocomplete=1; sid=00DPv000000fuXi!AQEAQNVd17egCdH_NB.Qcwvk5ZG9EP8cZONDxXDNCDi3Mczbneaya8hCxWLGnaxJU8GUV3omNAW2Wj1T26j47sMFRROJcWUm; sid_Client=v000001MB5tv000000fuXi; clientSrc=81.157.92.38; oid=00DPv000000fuXi; 79eb100099b9a8bf=3:false:.salesforce.com; idccsrf=382450550027570323317017829629063455687590152459083');
+        }
+        Test.stopTest();
+
+        // Assert the user Id
+        Assert.areEqual('0058d0000050rYpAAI', data.identifier, 'Unexpected UserId');
+    }
+
+
+
     /**
      * @description Method to test the log input validation logic
      */
@@ -164,6 +192,7 @@ private with sharing class AuthProviderUtilTest {
      *              This method also tests that all logic runs under user context
      */
     @IsTest
+    @SuppressWarnings('PMD.AvoidHardcodingId')
     static void testCallable(){
         Test.startTest();
         
@@ -235,6 +264,17 @@ private with sharing class AuthProviderUtilTest {
             });
             Assert.areEqual(targetUserId, getSubjectFromUserMappingResult,'Unexpected target Id');
 
+            // Create the mock response
+            utl.Mck.setResponse('{"active": true, "email": "henk@devries.nl", "email_verified": true, "family_name": "de Vries", "given_name": "Henk", "is_app_installed": true, "is_salesforce_integration_user": false, "locale": "en_GB", "name": "Henk de Vries", "preferred_username": "henk@devries.nl", "profile": "#", "user_id": "0058d0000050rYpAAI", "user_type": "STANDARD", "utcOffset": 0, "zoneinfo": "Europe/London"}');
+            
+            // Test getAuthUserDataFromCookieHeader
+            Auth.UserData getAuthUserDataFromCookieHeaderResult;
+            getAuthUserDataFromCookieHeaderResult = (Auth.UserData) extension.call('getAuthUserDataFromCookieHeader', new Map<String, Object> { 
+                'cookieHeader' => 'BrowserId=JrIF-JNyEe6Z1ZuCfDCB4w; BrowserId_sec=JrIF-JNyEe6Z1ZuCfDCB4w; sfdcConsent=1; CookieConsentPolicy=0:1; LSKey-c$CookieConsentPolicy=0:1; webact=%7B%22l_vdays%22%3A-1%2C%22l_visit%22%3A0%2C%22session%22%3A1701782904312%2C%22l_search%22%3A%22%22%2C%22l_dtype%22%3A%22SFDC%20Network%22%2C%22l_page%22%3A%22SFDC%3Aus%3Alogin%22%2C%22l_page_url%22%3A%22https%3A%2F%2Fc.salesforce.com%2Flogin-messages%2Fpromos.html%22%2C%22counter%22%3A0%2C%22pv%22%3A2%2C%22f_visit%22%3A1701782898284%2C%22seg%22%3A%22non-customer%3Aus%22%2C%22d%22%3A%2270130000000sUW0%22%7D; OptanonConsent=isGpcEnabled=0&datestamp=Tue+Dec+05+2023+13%3A28%3A24+GMT%2B0000+(Greenwich+Mean+Time)&version=202306.1.0&browserGpcFlag=0&isIABGlobal=false&hosts=&consentId=924e06fd-9173-487d-983d-601ba5903d80&interactionCount=1&landingPath=https%3A%2F%2Fc.salesforce.com%2Flogin-messages%2Fpromos.html&groups=1%3A1%2C3%3A0%2C2%3A0%2C4%3A0; inst=APP_Pv; rememberUn=false; com.salesforce.LocaleInfo=uk; oinfo=c3RhdHVzPVRSSUFMJnR5cGU9MyZvaWQ9MDBEUHYwMDAwMDBmdVhp; sfdc_lv2=KxG83HXUehD4n5M2wLsGr31CR3XUwK0AXt7PTdZyIRS6VZfF6pOuJeV85OdArj90o=; disco=Pv:00DPv000000fuXi:005Pv000001MB5t:6; autocomplete=1; sid=00DPv000000fuXi!AQEAQNVd17egCdH_NB.Qcwvk5ZG9EP8cZONDxXDNCDi3Mczbneaya8hCxWLGnaxJU8GUV3omNAW2Wj1T26j47sMFRROJcWUm; sid_Client=v000001MB5tv000000fuXi; clientSrc=81.157.92.38; oid=00DPv000000fuXi; 79eb100099b9a8bf=3:false:.salesforce.com; idccsrf=382450550027570323317017829629063455687590152459083'
+            });
+
+            // Assert the user Id
+            Assert.areEqual('0058d0000050rYpAAI', getAuthUserDataFromCookieHeaderResult.identifier, 'Unexpected UserId');
 
             try{
                 // Test the exception

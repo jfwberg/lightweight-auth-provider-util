@@ -71,6 +71,9 @@ global with sharing class AuthProviderUtil implements Callable{
     // Callable messages
     @TestVisible private static final String INVALID_METHOD_CALLED_MSG = 'The method {0} does not exist on class {1}.';
 
+    @TestVisible private static final String INVALID_SESSION_ID        ='Invalid session Id received from the cookie header';
+    @TestVisible private static final String UNEXPECTED_RESPONSE       ='Unexpected response whilst getting the session Id from the user info endpoint';
+
 
     /** **************************************************************************************************** **
      **                                           INTERFACE METHODS                                          **
@@ -103,6 +106,11 @@ global with sharing class AuthProviderUtil implements Callable{
                 return getSubjectFromUserMapping(
                     (String) args.get('authProviderName'),
                     (String) args.get('userId')
+                );
+            }
+            when 'getAuthUserDataFromCookieHeader'{
+                return getAuthUserDataFromCookieHeader(
+                    (String) args.get('cookieHeader')
                 );
             }
             when else {
@@ -212,6 +220,19 @@ global with sharing class AuthProviderUtil implements Callable{
     }
 
 
+    /**
+     * @description Method that returns the Auth Data of the currently Logged in User
+     *              This can be used with per user auth providers
+     * @param       cookieHeader The list of cookies that come from the
+     * @return      Auth.UserData object for the currently logged in user
+     */
+    global static Auth.UserData getAuthUserDataFromCookieHeader(String cookieHeader){
+        return getAuthUserDataFromSessionId(
+            getSessionIdFromCookieHeader(cookieHeader)
+        );
+    }
+
+
     /** **************************************************************************************************** **
      **                                       PRIVATE SUPPORT METHODS                                        **
      ** **************************************************************************************************** **/
@@ -263,6 +284,59 @@ global with sharing class AuthProviderUtil implements Callable{
 
         // Update the mapping
         update userMapping;
+    }
+
+
+    /**
+     * @description Method to get the session Id from a Cookie header value
+     * @param  cookieHeader The header containing all cookies
+     * @return      The Session Id for the logged in user
+     */
+    private static String getSessionIdFromCookieHeader(String cookieHeader){
+        return cookieHeader?.subStringAfter('sid=')?.substringBefore(';');
+    }
+
+
+    /**
+     * @description Method to get the session Id from a Cookie header value
+     * @param  sessionId The session Id of the logge din user
+     * @return All availible user data based on the session Id
+     */
+    private static Auth.UserData getAuthUserDataFromSessionId(String sessionId){
+        
+        // Validate session Id
+        if(String.isBlank(sessionId)){
+            throw new AuthProviderUtilException(INVALID_SESSION_ID);
+        }
+        
+        // Call the user info endpoint with the session Id
+        Map<String,Object> userInfoMap = (Map<String,Object>) JSON.deserializeUntyped(
+            new utl.Rst(URL.getOrgDomainURL().toExternalForm(), sessionId)
+                .setEndpoint('/services/oauth2/userinfo')
+                .call()
+                .getResponse()
+                .getBody()
+        );
+
+        // Check the response was OK
+        if(userInfoMap != null && userInfoMap.containsKey('user_id')){
+            return new Auth.UserData(
+                (String) userInfoMap.get('user_id'),
+                (String) userInfoMap.get('given_name'), 
+                (String) userInfoMap.get('family_name'),
+                (String) userInfoMap.get('name'),
+                (String) userInfoMap.get('email'),
+                (String) userInfoMap.get('profile'),
+                (String) userInfoMap.get('preferred_username'),
+                (String) userInfoMap.get('locale'),
+                null,  // Provider
+                null,  // Site login
+                null   // Attribute map
+            );
+        }
+        
+        // throw an error in case something goes wrong
+        throw new StringException(UNEXPECTED_RESPONSE);
     }
 
 

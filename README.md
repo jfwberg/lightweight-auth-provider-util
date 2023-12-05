@@ -19,14 +19,21 @@ If you use the *managed package* you need to installed the managed package depen
 |Managed Installation URL | */packaging/installPackage.apexp?p0=04tP30000007oePIAQ*
 |Unlocked Installation URL| */packaging/installPackage.apexp?p0=04tP30000007og1IAA*
 |Github URL | https://github.com/jfwberg/lightweight-apex-unit-test-util-v2
+| | |
+|Name|Lightweight - Apex REST Util|
+|Version|0.10.0-1|
+|Managed Installation URL | */packaging/installPackage.apexp?p0=04tP30000007FOvIAM*
+|Unlocked Installation URL| */packaging/installPackage.apexp?p0=04tP30000007FVNIA2*
+|Github URL | https://github.com/jfwberg/lightweight-apex-rest-util 
+
 
 ## Auth Provider Util v2 - Package Info
 | Package Info | Value |
 |---|---|
 |Name|Lightweight - Auth Provider Util v2|
-|Version|0.6.0-1|
-|Managed Installation URL | */packaging/installPackage.apexp?p0=04tP30000007sN3IAI*
-|Unlocked Installation URL| */packaging/installPackage.apexp?p0=04tP30000007sQHIAY*
+|Version|0.7.0-1|
+|Managed Installation URL | */packaging/installPackage.apexp?p0=04tP3000000DZxdIAG*
+|Unlocked Installation URL| */packaging/installPackage.apexp?p0=04tP3000000Da0rIAC*
 
 ## Implementation example
 An example (de-coupled) implementation can be found in the Lightweight - OAuth 2.0 JWT Client Credentials Auth Provider Repo
@@ -34,6 +41,9 @@ https://github.com/jfwberg/lightweight-oauth-jwt-client-credentials-auth-provide
 
 Another example can be found in the Lightweight - Data Cloud Auth Provider Repo
 https://github.com/jfwberg/lightweight-data-cloud-auth-provider
+
+Another example can be found in the Lightweight - Salesforce Auth Provider Repo
+https://github.com/jfwberg/lightweight-salesforce-auth-provider
 
 ## User Mapping
 User mappings allow you to create a "Per User Principal" integration with a custom Auth Provider in combination with Named/External credentials.
@@ -94,6 +104,13 @@ Logs have a logId field that needs to be unique, use this with a GUID to keep yo
 lwt.AuthProviderUtil.insertLog(String authProviderName, String userId, String logId, String message)
 ```
 
+## Utility methods
+```java
+// Method to generate  Auth.UserData from the logged in user using the cookie header
+// User this is you want to get current user details in an Auth Provider in a "Per User" mode
+Auth.UserData authUserData = lwt.getAuthUserDataFromCookieHeader(String cookieHeader)
+```
+
 ## View Logs
 1) Open the "*Auth Provider Util*" app through the app launcher
 2) Go to the "*Auth Provider Logs*" tab
@@ -150,12 +167,12 @@ getSubjectFromUserMappingResult = (String) authProviderInstance.call('getSubject
     'userId'           => userId
 });
 
-try{
-    authProviderInstance.call('invalid method',null);
-    throw new StringException('This part should not be reached');
-}catch(Exception e){
-    System.debug(e.getMessage());
-}
+
+Auth.UserData getAuthUserDataFromCookieHeaderResult;
+getAuthUserDataFromCookieHeader = (Auth.UserData) authProviderInstance.call('getAuthUserDataFromCookieHeader', new Map<String, Object> { 
+    'cookieHeader' => cookieHeader
+});
+
 ```
 
 
