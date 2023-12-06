@@ -14,6 +14,7 @@
     <navType>Standard</navType>
     <tabs>Auth_Provider_Log__c</tabs>
     <tabs>Auth_Provider_User_Mapping__c</tabs>
+    <tabs>Auth_Provider_Login_History__c</tabs>
     <uiType>Lightning</uiType>
     <utilityBar>Auth_Provider_Util_UtilityBar</utilityBar>
 </CustomApplication>

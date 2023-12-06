@@ -42,6 +42,14 @@ private with sharing class AuthProviderUtilTest {
                 authProviderName,
                 userId
             );
+
+            // Method to insert an (error) log. Can be used for a success as well, but that should be checked in the external system
+            AuthProviderUtil.insertLoginHistoryRecord(
+                authProviderName,
+                userId,
+                'Refresh',
+                Datetime.now()
+            );
         }
         Test.stopTest();
 
@@ -50,6 +58,13 @@ private with sharing class AuthProviderUtilTest {
             1,
             [SELECT COUNT() FROM Auth_Provider_Log__c],
             'Expected a single log record'
+        );
+
+        // Assert the new log is inserted
+        Assert.areEqual(
+            1,
+            [SELECT COUNT() FROM Auth_Provider_Login_History__c],
+            'Expected a single login history record'
         );
     }
 
@@ -237,6 +252,15 @@ private with sharing class AuthProviderUtilTest {
             });
             Assert.areEqual(null, insertLogResult,'Expected a void to return null');
 
+            // Test insertLog
+            Object insertLoginHistoryRecordResult;
+            insertLoginHistoryRecordResult = extension.call('insertLoginHistoryRecord', new Map<String, Object> { 
+                'authProviderName' => authProviderName,
+                'userId'           => userId,
+                'flowType'         => 'Refresh',
+                'timestamp'        => Datetime.now()
+            });
+            Assert.areEqual(null, insertLoginHistoryRecordResult,'Expected a void to return null but not give any errors');
 
             // Test checkUserMappingExistsResult
             Boolean checkUserMappingExistsResult;

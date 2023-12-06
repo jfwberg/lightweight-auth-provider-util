@@ -16,3 +16,10 @@ sf package install --package 04tP30000007og1IAA -w 30
 
 REM Unlocked package - Lightweight - REST Util (Unlocked)0.10.0-1
 sf package install --package 04tP30000007sQHIAY -w 30
+
+REM --------------------------------------------------------
+REM                  ASSIGN PERMISSION SETS                -
+REM --------------------------------------------------------
+sf org assign permset --name "Lightweight_Apex_Unit_Test_Util_v2"
+sf org assign permset --name "Lightweight_REST_Util"
+sf org assign permset --name "Lightweight_Auth_Provider_Util_Admin"

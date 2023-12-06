@@ -9,7 +9,7 @@
  *                                         Implementation, so global is the way to open up this
  *                                         utility for global use.
  */
-@SuppressWarnings('PMD.AvoidGlobalModifier')
+@SuppressWarnings('PMD.AvoidGlobalModifier, PMD.CognitiveComplexity')
 global with sharing class AuthProviderUtil implements Callable{
 
     /** **************************************************************************************************** **
@@ -26,11 +26,15 @@ global with sharing class AuthProviderUtil implements Callable{
     /** **************************************************************************************************** **
      **                                          PRIVATE CONSTANTS                                           **
      ** **************************************************************************************************** **/
-    // Describe the log and mapping object
+    // Describe the objects for security checks (Need to update this)
     private static final Schema.DescribeSObjectResult LOG_DESCRIBE_RESULT     = Auth_Provider_Log__c.getSObjectType().getDescribe(SObjectDescribeOptions.DEFERRED);
     private static final Schema.DescribeSObjectResult MAP_DESCRIBE_RESULT     = Auth_Provider_User_Mapping__c.getSObjectType().getDescribe(SObjectDescribeOptions.DEFERRED);
+    private static final Schema.DescribeSObjectResult HIS_DESCRIBE_RESULT     = Auth_Provider_Login_History__c.getSObjectType().getDescribe(SObjectDescribeOptions.DEFERRED);
+    
+    // Describe the events for security checks (Need to update this)
     private static final Schema.DescribeSObjectResult LOG_EVT_DESCRIBE_RESULT = Auth_Provider_Log_Event__e.getSObjectType().getDescribe(SObjectDescribeOptions.DEFERRED);
     private static final Schema.DescribeSObjectResult MAP_EVT_DESCRIBE_RESULT = Auth_Provider_User_Mapping_Event__e.getSObjectType().getDescribe(SObjectDescribeOptions.DEFERRED);
+    private static final Schema.DescribeSObjectResult HIS_EVT_DESCRIBE_RESULT = Auth_Provider_Login_History_Event__e.getSObjectType().getDescribe(SObjectDescribeOptions.DEFERRED);
 
     // Create a list of log fields with describes (these are the createable fields only)
     private static final Schema.DescribeFieldResult[] LOG_FIELD_DESCRIBE_RESULTS = new Schema.DescribeFieldResult[]{
@@ -42,28 +46,42 @@ global with sharing class AuthProviderUtil implements Callable{
 
     // Create a list of mapping fields with describes (these are the updateable fields only)
     private static final Schema.DescribeFieldResult[] MAP_FIELD_DESCRIBE_RESULTS = new Schema.DescribeFieldResult[]{
-        Auth_Provider_Log__c.Auth_Provider_Name__c.getDescribe(),
-        Auth_Provider_Log__c.User__c.getDescribe(),
+        Auth_Provider_User_Mapping__c.Auth_Provider_Name__c.getDescribe(),
+        Auth_Provider_User_Mapping__c.User__c.getDescribe(),
         Auth_Provider_User_Mapping__c.Last_Auth_Provider_Log__c.getDescribe(),
         Auth_Provider_User_Mapping__c.Last_Login_Date__c.getDescribe(),
         Auth_Provider_User_Mapping__c.Number_of_Logins__c.getDescribe()
+    };
+    
+    // Create a list of mapping fields with describes (these are the updateable fields only)
+    private static final Schema.DescribeFieldResult[] HIS_FIELD_DESCRIBE_RESULTS = new Schema.DescribeFieldResult[]{
+        Auth_Provider_Login_History__c.Auth_Provider_Name__c.getDescribe(),
+        Auth_Provider_Login_History__c.User__c.getDescribe(),
+        Auth_Provider_Login_History__c.Flow_Type__c.getDescribe(),
+        Auth_Provider_Login_History__c.Timestamp__c.getDescribe()
     };
 
     // Log access messages
     private static final String LOG_SOBJECT_ACCESS_MSG = 'The current user is not allowed to CREATE "Auth_Provider_Log__c" records.';
     private static final String LOG_FIELD_ACCESS_MSG   = 'The current user does not have CREATE access on "Auth_Provider_Name__c", "User__c", "Log_Id__c" and "Message__c" fields on the "Auth_Provider_Log__c" sObject.';
-
+    
     // Mapping access messages
     private static final String MAP_SOBJECT_ACCESS_MSG = 'The current user is not allowed to UPDATE "Auth_Provider_User_Mapping__c" records.';
     private static final String MAP_FIELD_ACCESS_MSG   = 'The current user does not have UPDATE access on the "Last_Login_Date__c","Number_of_Logins__c" and "Last_Auth_Provider_Log__c" fields on the "Auth_Provider_User_Mapping__c" sObject.';
 
+    // Mapping access messages
+    private static final String HIS_SOBJECT_ACCESS_MSG = 'The current user is not allowed to CREATE "Auth_Provider_Login_History__c" records.';
+    private static final String HIS_FIELD_ACCESS_MSG   = 'The current user does not have CREATE access on the "User__c", "Auth_Provider_Name__c", "Flow_Type__c" and "Timestamp__c" fields on the "Auth_Provider_Login_History__c" sObject.';
+
     // Event access messages
     private static final String LOG_EVT_SOBJECT_ACCESS_MSG = 'The current user is not allowed to CREATE "Auth_Provider_Log_Event__e" records.';
     private static final String MAP_EVT_SOBJECT_ACCESS_MSG = 'The current user is not allowed to CREATE "Auth_Provider_User_Mapping_Event__e" records.';
+    private static final String HIS_EVT_SOBJECT_ACCESS_MSG = 'The current user is not allowed to CREATE "Auth_Provider_Login_History_Event__c" records.';
 
     // Add validation mesages
     @TestVisible private static final String LOG_INPUT_VALIDATION_MSG  = 'The fields "Auth_Provider_Name__c", "User__c", "Log_Id__c" and  "Message__c" on the sObject "Auth_Provider_Log__c" are mandatory and cannot be blank.';
     @TestVisible private static final String MAP_INPUT_VALIDATION_MSG  = 'The fields "Auth_Provider_Name__c" and "User__c" on the sObject "Auth_Provider_User_Mapping__c" are mandatory and cannot be blank.';
+    @TestVisible private static final String HIS_INPUT_VALIDATION_MSG  = 'The fields "Auth_Provider_Name__c", "User__c", "Flow_Type__c" and "Timestamp__c" on the sObject "Auth_Provider_Login_History__c" are mandatory and cannot be blank.';
     
     // Trigger validation messages
     @TestVisible private static final String INVALID_AUTH_PROVIDER_MSG = 'The Auth Provider with DeveloperName "{0}" does not exist in the metadata. Please check your Auth Provider DeveloperName.';
@@ -113,6 +131,15 @@ global with sharing class AuthProviderUtil implements Callable{
                     (String) args.get('cookieHeader')
                 );
             }
+            when 'insertLoginHistoryRecord'{
+                insertLoginHistoryRecord(
+                    (String)  args.get('authProviderName'),
+                    (String)  args.get('userId'),
+                    (String)  args.get('flowType'),
+                    (Datetime)args.get('timestamp')
+                );
+                return null;
+            }
             when else {
                 throw new AuthProviderUtilException(INVALID_METHOD_CALLED_MSG);
             }
@@ -120,7 +147,7 @@ global with sharing class AuthProviderUtil implements Callable{
     }
     
     /** **************************************************************************************************** **
-     **                                        PUBLIC SUPPORT METHODS                                        **
+     **                                        GLOBAL SUPPORT METHODS                                        **
      ** **************************************************************************************************** **/
     /**
      * @description    Method to manage the security and input validation for an Auth_Provider_Log__c record
@@ -162,6 +189,49 @@ global with sharing class AuthProviderUtil implements Callable{
         // Publish the event
         Eventbus.publish(logEvent); 
     }
+
+
+    /**
+     * @description    Method to manage the security and input validation for an Auth_Provider_Log__c record
+     *                 This takes care of the boilerplate code when this utility is used from an Auth
+     *                 Provider Class
+     * @param          authProviderName           The DeveloperName of the auth provider
+     * @param          userId                     The 18 character Id of the required user
+     * @param          flowType                   Initial or Refresh
+     * @param          timestamp                  The timestamp of the login
+     * @note           This code is not bulkified. Due to the nature of how it runs, it will (should)
+     *                 only one record at a time.
+     * @false-positive PMD.ExcessiveParameterList It's not that many parameters over the threshold of
+     *                                            3. Imho this is still fine.
+     * @false-positive PMD.ApexCRUDViolation      The CRUD is checked with a utility method so PMD does
+     *                                            not pick up on this.
+     */
+    @SuppressWarnings('PMD.ExcessiveParameterList, PMD.ApexCRUDViolation')
+    global static void insertLoginHistoryRecord(String authProviderName, String userId, String flowType, Datetime timestamp){
+        
+        // Check the current user can create Auth_Provider_Log_Event__e records
+        checkLoginHistoryEventInsertAccess();
+
+        // Validate the input values and specify the exception message to be thrown
+        validateInput(
+            new String[]{authProviderName, userId, flowType, String.valueOf(timestamp)},
+            HIS_INPUT_VALIDATION_MSG
+        );
+
+        // Create a new log event and validate field lengths etc
+        // These match the lengthts in the log object, so lets use those as they are already described
+        Auth_Provider_Login_History_Event__e hisEvent = new Auth_Provider_Login_History_Event__e(
+            Auth_Provider_Name__c = (authProviderName.length() <= HIS_FIELD_DESCRIBE_RESULTS[0].getLength()) ? authProviderName : authProviderName.subString(0, HIS_FIELD_DESCRIBE_RESULTS[0].getLength()),
+            User__c               = (userId.length()           <= HIS_FIELD_DESCRIBE_RESULTS[1].getLength()) ? userId           : userId.subString(0,           HIS_FIELD_DESCRIBE_RESULTS[1].getLength()),
+            Flow_Type__c          = (flowType.length()         <= HIS_FIELD_DESCRIBE_RESULTS[2].getLength()) ? flowType         : flowType.subString(0,         HIS_FIELD_DESCRIBE_RESULTS[2].getLength()),
+            Timestamp__c          = timestamp
+        );
+
+        // Publish the event
+        Eventbus.publish(hisEvent); 
+    }
+
+
 
 
     /**
@@ -443,6 +513,38 @@ global with sharing class AuthProviderUtil implements Callable{
 
 
     /**
+     * @description    Method that insert a login history record based on a platform event
+     * @param          events                        List of Auth_Provider_Login_History_Event__e records that
+     *                                               need to be inserted as a Auth_Provider_Log__c
+     *                                               record
+     * @false-positive PMD.ApexCRUDViolation         The CRUD is checked with a utility method so PMD
+     *                                               does not pick up on this.
+     */
+    @SuppressWarnings('PMD.ApexCRUDViolation')
+    public static void insertHistoryRecord(Auth_Provider_Login_History_Event__e[] events){
+        
+        // If there are no events for some magical reason, dont run the logic
+        if(events == null || events.isEmpty()){
+            return;
+        }
+
+        // Check the current user has access to insert login history records
+        checkLoginHistoryCreateAccess();
+
+        // Create a new record, input validations have been done when creating the platofrm event
+        Auth_Provider_Login_History__c historyRecord = new Auth_Provider_Login_History__c(
+            Auth_Provider_Name__c = events[0].Auth_Provider_Name__c,
+            User__c              = events[0].User__c,
+            Flow_Type__c          = events[0].Flow_Type__c,
+            Timestamp__c          = events[0].Timestamp__c
+        );
+
+        // Insert the new record
+        insert historyRecord;
+    }
+
+
+    /**
      * @description Method that updates a user mapping record based on a platform event
      * @param       events List of Auth_Provider_User_Mapping_Event__e records that need to be updated
      */
@@ -541,10 +643,34 @@ global with sharing class AuthProviderUtil implements Callable{
 
 
     /**
+     * @description    Method to validate create access on the Auth_Provider_Login_History__c sObject and
+     *                 fields
+     * @throws         AuthProviderUtilException A user does not have the correct access level
+     * @false-positive PMD.OneDeclarationPerLine This is a declaration inside a for loop for
+     *                                           optimization. This is still easily readable and has no
+     *                                           big impact
+     */
+    @SuppressWarnings('PMD.OneDeclarationPerLine')
+    private static void checkLoginHistoryCreateAccess(){
+        
+        // sObject Access check
+        if(!HIS_DESCRIBE_RESULT.isUpdateable()){
+            throw new AuthProviderUtilException(HIS_SOBJECT_ACCESS_MSG);
+        }
+        
+        // FLS Check
+        for(Integer i=0, max=HIS_FIELD_DESCRIBE_RESULTS.size();i<max;i++){
+            if(!HIS_FIELD_DESCRIBE_RESULTS[i].isUpdateable()){
+                throw new AuthProviderUtilException(HIS_FIELD_ACCESS_MSG);
+            }
+        }
+    }
+
+
+    /**
      * @description Method to validate that the current user can create log event records
      */
     private static void checkLogEventCreateAccess(){
-        // sObject Access check
         if(!LOG_EVT_DESCRIBE_RESULT.isCreateable()){
             throw new AuthProviderUtilException(LOG_EVT_SOBJECT_ACCESS_MSG);
         }
@@ -555,9 +681,18 @@ global with sharing class AuthProviderUtil implements Callable{
      * @description Method to check if the current user can create user mapping event records
      */
     private static void checkMappingEventCreateAccess(){
-        // sObject Access check
         if(!MAP_EVT_DESCRIBE_RESULT.isCreateable()){
             throw new AuthProviderUtilException(MAP_EVT_SOBJECT_ACCESS_MSG);
+        }
+    }
+
+
+    /**
+     * @description Method to check if the current user can create login history event records
+     */
+    private static void checkLoginHistoryEventInsertAccess(){
+        if(!HIS_EVT_DESCRIBE_RESULT.isCreateable()){
+            throw new AuthProviderUtilException(HIS_EVT_SOBJECT_ACCESS_MSG);
         }
     }
 

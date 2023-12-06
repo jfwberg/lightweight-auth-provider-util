@@ -25,6 +25,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>Auth_Provider_Login_History__c.User__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>Auth_Provider_User_Mapping__c.Auth_Provider_User_Id_Validation__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -74,6 +79,24 @@
         <allowEdit>false</allowEdit>
         <allowRead>true</allowRead>
         <modifyAllRecords>false</modifyAllRecords>
+        <object>Auth_Provider_Login_History_Event__e</object>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>true</allowDelete>
+        <allowEdit>true</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>true</modifyAllRecords>
+        <object>Auth_Provider_Login_History__c</object>
+        <viewAllRecords>true</viewAllRecords>
+    </objectPermissions>
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>false</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
         <object>Auth_Provider_User_Mapping_Event__e</object>
         <viewAllRecords>false</viewAllRecords>
     </objectPermissions>
@@ -97,6 +120,10 @@
     </objectPermissions>
     <tabSettings>
         <tab>Auth_Provider_Log__c</tab>
+        <visibility>Visible</visibility>
+    </tabSettings>
+    <tabSettings>
+        <tab>Auth_Provider_Login_History__c</tab>
         <visibility>Visible</visibility>
     </tabSettings>
     <tabSettings>

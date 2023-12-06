@@ -9,6 +9,8 @@ The utility consists of an App called "Auth Provider Util" and two sObjects: "Au
 
 There are also two platform event objects because Auth Providers cannot use DML, so we use a platform event with a trigger to create logging records and update the login information.
 
+Note: Security implementation needs to be simplified in the next release.
+
 ## Dependency - Package Info
 The following package need to be installed first before installing this package.
 If you use the *managed package* you need to installed the managed package dependency and if you use the *unlocked version* you need to use the unlocked dependency.
@@ -31,9 +33,9 @@ If you use the *managed package* you need to installed the managed package depen
 | Package Info | Value |
 |---|---|
 |Name|Lightweight - Auth Provider Util v2|
-|Version|0.7.0-1|
-|Managed Installation URL | */packaging/installPackage.apexp?p0=04tP3000000DZxdIAG*
-|Unlocked Installation URL| */packaging/installPackage.apexp?p0=04tP3000000Da0rIAC*
+|Version|0.8.0-1|
+|Managed Installation URL | */packaging/installPackage.apexp?p0=04tP3000000DieLIAS*
+|Unlocked Installation URL| */packaging/installPackage.apexp?p0=04tP3000000Dj5lIAC*
 
 ## Implementation example
 An example (de-coupled) implementation can be found in the Lightweight - OAuth 2.0 JWT Client Credentials Auth Provider Repo
@@ -102,6 +104,9 @@ Logs have a logId field that needs to be unique, use this with a GUID to keep yo
 ```java
 // Method to insert a log entry
 lwt.AuthProviderUtil.insertLog(String authProviderName, String userId, String logId, String message)
+
+// Method to register a login for a certain user
+lwt.AuthProviderUtil.insertLoginHistoryRecord(String authProviderName, String userId, String flowType, Datetime timestamp)
 ```
 
 ## Utility methods
@@ -141,12 +146,20 @@ Not every package Auth Provider you use will need this package, to allow for loo
 // 
 Callable authProviderInstance = (Callable) Type.forName('lwt.AuthProviderUtil').newInstance();
 
-Object insertLogResult;
-insertLogResult = authProviderInstance.call('insertLog', new Map<String, Object> { 
+// void
+authProviderInstance.call('insertLog', new Map<String, Object> { 
     'authProviderName' => authProviderName,
     'userId'           => userId,
     'logId'            => logId,
     'message'          => message
+});
+
+// void
+authProviderInstance.call('insertLoginHistoryRecord', new Map<String, Object> { 
+    'authProviderName' => authProviderName,
+    'userId'           => userId,
+    'flowType'         => 'Refresh', // Initial or Refresh 
+    'timestamp'        => Datetime.now()
 });
 
 Boolean checkUserMappingExistsResult;
@@ -174,7 +187,6 @@ getAuthUserDataFromCookieHeader = (Auth.UserData) authProviderInstance.call('get
 });
 
 ```
-
 
 ## Links
 - https://help.salesforce.com/s/articleView?id=sf.nc_user_external_credentials.htm&type=5
