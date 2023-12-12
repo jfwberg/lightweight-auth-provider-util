@@ -185,9 +185,6 @@ private with sharing class AuthProviderUtilTest {
                 Datetime.now()
             );
             
-            // Force delivery because the platform events do not run in bulk (should be fixed)
-            Test.getEventBus().deliver();
-
             // Main method to insert a login history record
             AuthProviderUtil.insertLoginHistoryRecord(
                 authProviderName,
@@ -198,9 +195,6 @@ private with sharing class AuthProviderUtilTest {
                 'Data Cloud',
                 'Additional info'
             );
-
-            // Force delivery because the platform events do not run in bulk (should be fixed)
-            Test.getEventBus().deliver();
         }
         Test.stopTest();
 

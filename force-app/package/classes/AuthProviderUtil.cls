@@ -197,7 +197,6 @@ global with sharing class AuthProviderUtil implements Callable{
     }
 
 
-
     /**
      * @description Overload method with a few default values
      */
@@ -535,19 +534,25 @@ global with sharing class AuthProviderUtil implements Callable{
         // Check the current user has access to insert login history records
         checkLoginHistoryCreateAccess();
 
-        // Create a new record, input validations have been done when creating the platofrm event
-        Auth_Provider_Login_History__c historyRecord = new Auth_Provider_Login_History__c(
-            Auth_Provider_Name__c = events[0].Auth_Provider_Name__c,
-            User__c               = events[0].User__c,
-            Flow_Type__c          = events[0].Flow_Type__c,
-            Timestamp__c          = events[0].Timestamp__c,
-            Success__c            = events[0].Success__c,
-            Provider_Type__c      = events[0].Provider_Type__c,
-            Login_Info__c         = events[0].Login_Info__c
-        );
+        // List of hisory records
+        Auth_Provider_Login_History__c[] historyRecords = new Auth_Provider_Login_History__c []{};
 
+        // Add all records
+        for (Integer i = 0, max=events.size(); i < max; i++) {
+            // Create a new record, input validations have been done when creating the platofrm event
+            historyRecords.add(new Auth_Provider_Login_History__c(
+                Auth_Provider_Name__c = events[i].Auth_Provider_Name__c,
+                User__c               = events[i].User__c,
+                Flow_Type__c          = events[i].Flow_Type__c,
+                Timestamp__c          = events[i].Timestamp__c,
+                Success__c            = events[i].Success__c,
+                Provider_Type__c      = events[i].Provider_Type__c,
+                Login_Info__c         = events[i].Login_Info__c
+            ));   
+        }
+        
         // Insert the new record
-        insert historyRecord;
+        insert historyRecords;
     }
 
 

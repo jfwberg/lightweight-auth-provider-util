@@ -6,6 +6,9 @@
     <columns>User__c</columns>
     <columns>Flow_Type__c</columns>
     <columns>Timestamp__c</columns>
+    <columns>Success__c</columns>
+    <columns>Provider_Type__c</columns>
+    <columns>Login_Info__c</columns>
     <filterScope>Everything</filterScope>
     <label>All</label>
 </ListView>
