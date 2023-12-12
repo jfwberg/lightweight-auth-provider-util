@@ -33,9 +33,9 @@ If you use the *managed package* you need to installed the managed package depen
 | Package Info | Value |
 |---|---|
 |Name|Lightweight - Auth Provider Util v2|
-|Version|0.8.0-1|
-|Managed Installation URL | */packaging/installPackage.apexp?p0=04tP3000000DieLIAS*
-|Unlocked Installation URL| */packaging/installPackage.apexp?p0=04tP3000000Dj5lIAC*
+|Version|0.9.0-1|
+|Managed Installation URL | */packaging/installPackage.apexp?p0=04tP3000000ENG6IAO*
+|Unlocked Installation URL| */packaging/installPackage.apexp?p0=04tP3000000ENKvIAO*
 
 ## Implementation example
 An example (de-coupled) implementation can be found in the Lightweight - OAuth 2.0 JWT Client Credentials Auth Provider Repo
@@ -105,8 +105,11 @@ Logs have a logId field that needs to be unique, use this with a GUID to keep yo
 // Method to insert a log entry
 lwt.AuthProviderUtil.insertLog(String authProviderName, String userId, String logId, String message)
 
-// Method to register a login for a certain user
+// Method to register a login for a certain user (overload method)
 lwt.AuthProviderUtil.insertLoginHistoryRecord(String authProviderName, String userId, String flowType, Datetime timestamp)
+
+// Method to register a login for a certain user
+lwt.AuthProviderUtil.insertLoginHistoryRecord(String authProviderName, String userId, String flowType, Datetime timestamp, Boolean success, String providerType, String loginInfo)
 ```
 
 ## Utility methods
@@ -159,7 +162,10 @@ authProviderInstance.call('insertLoginHistoryRecord', new Map<String, Object> {
     'authProviderName' => authProviderName,
     'userId'           => userId,
     'flowType'         => 'Refresh', // Initial or Refresh 
-    'timestamp'        => Datetime.now()
+    'timestamp'        => Datetime.now(),
+    'success'          => true, // or false
+    'providerType'     => 'Data Cloud',
+    'loginInfo'        => 'Optional debug info or login error info'
 });
 
 Boolean checkUserMappingExistsResult;

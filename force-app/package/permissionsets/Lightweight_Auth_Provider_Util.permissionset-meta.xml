@@ -25,6 +25,21 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>Auth_Provider_Login_History__c.Login_Info__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Auth_Provider_Login_History__c.Provider_Type__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Auth_Provider_Login_History__c.Success__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>Auth_Provider_Login_History__c.User__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -54,7 +69,7 @@
         <readable>true</readable>
     </fieldPermissions>
     <hasActivationRequired>false</hasActivationRequired>
-    <label>Lightweight - Auth Provider Util - Admin</label>
+    <label>Lightweight - Auth Provider Util</label>
     <objectPermissions>
         <allowCreate>true</allowCreate>
         <allowDelete>false</allowDelete>

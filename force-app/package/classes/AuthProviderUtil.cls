@@ -58,7 +58,10 @@ global with sharing class AuthProviderUtil implements Callable{
         Auth_Provider_Login_History__c.Auth_Provider_Name__c.getDescribe(),
         Auth_Provider_Login_History__c.User__c.getDescribe(),
         Auth_Provider_Login_History__c.Flow_Type__c.getDescribe(),
-        Auth_Provider_Login_History__c.Timestamp__c.getDescribe()
+        Auth_Provider_Login_History__c.Timestamp__c.getDescribe(),
+        Auth_Provider_Login_History__c.Success__c.getDescribe(),
+        Auth_Provider_Login_History__c.Provider_Type__c.getDescribe(),
+        Auth_Provider_Login_History__c.Login_Info__c.getDescribe()
     };
 
     // Log access messages
@@ -71,7 +74,7 @@ global with sharing class AuthProviderUtil implements Callable{
 
     // Mapping access messages
     private static final String HIS_SOBJECT_ACCESS_MSG = 'The current user is not allowed to CREATE "Auth_Provider_Login_History__c" records.';
-    private static final String HIS_FIELD_ACCESS_MSG   = 'The current user does not have CREATE access on the "User__c", "Auth_Provider_Name__c", "Flow_Type__c" and "Timestamp__c" fields on the "Auth_Provider_Login_History__c" sObject.';
+    private static final String HIS_FIELD_ACCESS_MSG   = 'The current user does not have CREATE access on the "User__c", "Auth_Provider_Name__c", "Flow_Type__c", "Timestamp__c", "Success__c","Provider_Type__c" and "Login_Info__c" fields on the "Auth_Provider_Login_History__c" sObject.';
 
     // Event access messages
     private static final String LOG_EVT_SOBJECT_ACCESS_MSG = 'The current user is not allowed to CREATE "Auth_Provider_Log_Event__e" records.';
@@ -136,7 +139,10 @@ global with sharing class AuthProviderUtil implements Callable{
                     (String)  args.get('authProviderName'),
                     (String)  args.get('userId'),
                     (String)  args.get('flowType'),
-                    (Datetime)args.get('timestamp')
+                    (Datetime)args.get('timestamp'),
+                    (Boolean) args.get('success'),
+                    (String)  args.get('providerType'),
+                    (String)  args.get('loginInfo')
                 );
                 return null;
             }
@@ -191,6 +197,15 @@ global with sharing class AuthProviderUtil implements Callable{
     }
 
 
+
+    /**
+     * @description Overload method with a few default values
+     */
+    global static void insertLoginHistoryRecord(String authProviderName, String userId, String flowType, Datetime timestamp){
+        insertLoginHistoryRecord(authProviderName,userId, flowType, timestamp,true,null,null);
+    }
+
+
     /**
      * @description    Method to manage the security and input validation for an Auth_Provider_Log__c record
      *                 This takes care of the boilerplate code when this utility is used from an Auth
@@ -207,7 +222,7 @@ global with sharing class AuthProviderUtil implements Callable{
      *                                            not pick up on this.
      */
     @SuppressWarnings('PMD.ExcessiveParameterList, PMD.ApexCRUDViolation')
-    global static void insertLoginHistoryRecord(String authProviderName, String userId, String flowType, Datetime timestamp){
+    global static void insertLoginHistoryRecord(String authProviderName, String userId, String flowType, Datetime timestamp, Boolean success, String providerType, String loginInfo){
         
         // Check the current user can create Auth_Provider_Log_Event__e records
         checkLoginHistoryEventInsertAccess();
@@ -222,16 +237,17 @@ global with sharing class AuthProviderUtil implements Callable{
         // These match the lengthts in the log object, so lets use those as they are already described
         Auth_Provider_Login_History_Event__e hisEvent = new Auth_Provider_Login_History_Event__e(
             Auth_Provider_Name__c = (authProviderName.length() <= HIS_FIELD_DESCRIBE_RESULTS[0].getLength()) ? authProviderName : authProviderName.subString(0, HIS_FIELD_DESCRIBE_RESULTS[0].getLength()),
-            User__c               = (userId.length()           <= HIS_FIELD_DESCRIBE_RESULTS[1].getLength()) ? userId           : userId.subString(0,           HIS_FIELD_DESCRIBE_RESULTS[1].getLength()),
-            Flow_Type__c          = (flowType.length()         <= HIS_FIELD_DESCRIBE_RESULTS[2].getLength()) ? flowType         : flowType.subString(0,         HIS_FIELD_DESCRIBE_RESULTS[2].getLength()),
-            Timestamp__c          = timestamp
+            User__c               = (userId.length()           <= HIS_FIELD_DESCRIBE_RESULTS[1].getLength()) ? userId           : userId.subString(          0, HIS_FIELD_DESCRIBE_RESULTS[1].getLength()),
+            Flow_Type__c          = (flowType.length()         <= HIS_FIELD_DESCRIBE_RESULTS[2].getLength()) ? flowType         : flowType.subString(        0, HIS_FIELD_DESCRIBE_RESULTS[2].getLength()),
+            Timestamp__c          = timestamp,
+            Success__c            = success,
+            Provider_Type__c      = String.isBlank(providerType) ? null : (providerType.length() <= HIS_FIELD_DESCRIBE_RESULTS[5].getLength()) ? providerType : providerType.subString(0, HIS_FIELD_DESCRIBE_RESULTS[5].getLength()),
+            Login_Info__c         = String.isBlank(loginInfo)    ? null : (loginInfo?.length()   <= HIS_FIELD_DESCRIBE_RESULTS[6].getLength()) ? loginInfo    : loginInfo.subString(   0, HIS_FIELD_DESCRIBE_RESULTS[6].getLength())
         );
 
         // Publish the event
         Eventbus.publish(hisEvent); 
     }
-
-
 
 
     /**
@@ -449,18 +465,6 @@ global with sharing class AuthProviderUtil implements Callable{
 
 
     /**
-     * @description Method that updates the owner field based on a different field on the sObject
-     * @param       sObjectField The SObjectField object that needs to be referenced
-     * @param       records      A list of SObject records
-     */
-    public static void updateOwner(SObjectField sObjectField, SObject[] records){
-        for(SObject record : records){
-            record.put('OwnerId', (Id) record.get(String.valueOf(sObjectField)));
-        }
-    }
-
-
-    /**
      * @description Method to concatenate multiple fields into a single field to generate a unique
      *              combined valued
      * @param       concatFields The fields to concatenate
@@ -534,9 +538,12 @@ global with sharing class AuthProviderUtil implements Callable{
         // Create a new record, input validations have been done when creating the platofrm event
         Auth_Provider_Login_History__c historyRecord = new Auth_Provider_Login_History__c(
             Auth_Provider_Name__c = events[0].Auth_Provider_Name__c,
-            User__c              = events[0].User__c,
+            User__c               = events[0].User__c,
             Flow_Type__c          = events[0].Flow_Type__c,
-            Timestamp__c          = events[0].Timestamp__c
+            Timestamp__c          = events[0].Timestamp__c,
+            Success__c            = events[0].Success__c,
+            Provider_Type__c      = events[0].Provider_Type__c,
+            Login_Info__c         = events[0].Login_Info__c
         );
 
         // Insert the new record
@@ -551,14 +558,10 @@ global with sharing class AuthProviderUtil implements Callable{
     public static void updateMappingRecord (Auth_Provider_User_Mapping_Event__e[] events){
         
         // If there are no events for some magical reason, dont run the logic
-        if(events == null || events.isEmpty()){
-            return;
-        }
+        if(events == null || events.isEmpty()){return;}
 
         // If no mapping exists nothing has to happen
-        if(!checkUserMappingExists(events[0].Auth_Provider_Name__c, events[0].User__c)){
-            return;
-        }
+        if(!checkUserMappingExists(events[0].Auth_Provider_Name__c, events[0].User__c)){return;}
 
         // Validate the user has update access
         checkUserMappingUpdateAccess();

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Success__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Optional indicator if the login attempt was successful</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Optional indicator if the login attempt was successful</inlineHelpText>
+    <label>Success</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

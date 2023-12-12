@@ -22,4 +22,4 @@ REM                  ASSIGN PERMISSION SETS                -
 REM --------------------------------------------------------
 sf org assign permset --name "Lightweight_Apex_Unit_Test_Util_v2"
 sf org assign permset --name "Lightweight_REST_Util"
-sf org assign permset --name "Lightweight_Auth_Provider_Util_Admin"
+sf org assign permset --name "Lightweight_Auth_Provider_Util"

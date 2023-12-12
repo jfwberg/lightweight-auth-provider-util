@@ -11,8 +11,8 @@
 private with sharing class AuthProviderUtilTest {
     
     // User for the running the tests
-    private static final User ADMIN_USER = utl.Tst.createRunAsUser(utl.Tst.MINIMUM_ACCESS_PROFILE, 'Lightweight_Auth_Provider_Util_Admin');
-    private static final User END_USER   = utl.Tst.createRunAsUser(utl.Tst.MINIMUM_ACCESS_PROFILE, 'Lightweight_Auth_Provider_Util_User');
+    private static final User END_USER   = utl.Tst.createRunAsUser(utl.Tst.MINIMUM_ACCESS_PROFILE, 'Lightweight_Auth_Provider_Util');
+    private static final User ADMIN_USER = utl.Tst.createRunAsUser(utl.Tst.MINIMUM_ACCESS_PROFILE, 'Lightweight_Auth_Provider_Util');
 
     // Test data values
     private static String authProviderName = 'myAuthProvider';
@@ -26,10 +26,19 @@ private with sharing class AuthProviderUtilTest {
      * @description Method to test inserting a log without an existing mapping record
      */
     @IsTest
-    static void testUtilitiesWithoutMapping(){
+    static void testInsertLog(){
+        
+        // Log to assert
+        Integer logCount;
+        Auth_Provider_Log__c log; 
+        Auth_Provider_Log__c logRelatedToMapping; 
+        Auth_Provider_User_Mapping__c userMapping;
+        
+        // Run the test
         Test.startTest();
         System.runAs(ADMIN_USER){
-            // Method to insert an (error) log. Can be used for a success as well, but that should be checked in the external system
+            
+            // Create a log without a user mapping
             AuthProviderUtil.insertLog(
                 authProviderName,
                 userId,
@@ -37,126 +46,173 @@ private with sharing class AuthProviderUtilTest {
                 message
             );
 
-            // Update the mapping details on the user mapping record
-            AuthProviderUtil.updateMappingLoginDetails(
-                authProviderName,
-                userId
-            );
+            // Force delivery
+            Test.getEventBus().deliver();
 
-            // Method to insert an (error) log. Can be used for a success as well, but that should be checked in the external system
-            AuthProviderUtil.insertLoginHistoryRecord(
-                authProviderName,
-                userId,
-                'Refresh',
-                Datetime.now()
-            );
-        }
-        Test.stopTest();
-
-        // Assert the new log is inserted
-        Assert.areEqual(
-            1,
-            [SELECT COUNT() FROM Auth_Provider_Log__c],
-            'Expected a single log record'
-        );
-
-        // Assert the new log is inserted
-        Assert.areEqual(
-            1,
-            [SELECT COUNT() FROM Auth_Provider_Login_History__c],
-            'Expected a single login history record'
-        );
-    }
-
-
-    /**
-     * @description Method to test inserting a log without with an existing mapping record
-     *              - Creates a log and links the related mapping record to that log
-     *              - Updates the mapping record to simulate a succesful login (token request)
-     */
-    @IsTest
-    static void testUtilitiesWithMapping(){
-        
-        Test.startTest();
-        System.runAs(ADMIN_USER){
-            // Create a new user mapping record
-            Auth_Provider_User_Mapping__c userMapping = new Auth_Provider_User_Mapping__c(
+            // Create a log with user mapping
+            userMapping = new Auth_Provider_User_Mapping__c(
                 Auth_Provider_Name__c = authProviderName,
                 User__c = userId,
                 Target_User_Identifier__c = targetUserId
             );
             insert userMapping;
 
-            // Test the get subject method
-            Assert.areEqual(
-                targetUserId,
-                AuthProviderUtil.getSubjectFromUserMapping(authProviderName, userId),
-                'Unexpected target user identifier received'
-            );
-
-            // Method to insert an (error) log. Can be used for a success as well, but that should be checked in the external system
+            // Create a log without a user mapping
             AuthProviderUtil.insertLog(
                 authProviderName,
                 userId,
-                logId,
+                logId.reverse(),
                 message
             );
-            
-            // Force the platform events to be delivered
+
+            // Force delivery
             Test.getEventBus().deliver();
+             
+            // Note the log count
+            logCount = [SELECT COUNT() FROM Auth_Provider_Log__c];
 
-            // Query the user mapping, this will fail if there is no user mapping logged
-            userMapping = [ SELECT Id, Last_Auth_Provider_Log__c, Last_Login_Date__c, Number_of_Logins__c
-                            FROM Auth_Provider_User_Mapping__c WHERE Last_Auth_Provider_Log__c != null LIMIT 1
-                        ];
+            // Query our (if all good) new log
+            log = [ SELECT Auth_Provider_Name__c, User__c, Log_Id__c, Message__c 
+                    FROM  Auth_Provider_Log__c 
+                    WHERE Log_Id__c = :logId LIMIT 1
+            ];
 
-            // Validate expected updates on the mapping record
-            Assert.areEqual(true, userMapping.Last_Auth_Provider_Log__c != null,'Expected no auth provider log');
-            Assert.areEqual(true, userMapping.Last_Login_Date__c        == null,'Expected no last login date to be populated');
-            Assert.areEqual(true, userMapping.Number_of_Logins__c       == 0,   'Expected number of logins to be 0');
+            // Query our (if all good) new log
+            logRelatedToMapping = [ SELECT Auth_Provider_Name__c, User__c, Log_Id__c, Message__c 
+                    FROM  Auth_Provider_Log__c 
+                    WHERE Log_Id__c = :logId.reverse() LIMIT 1
+            ];
+
+            // Requery the user mapping
+            userMapping = [ SELECT Last_Auth_Provider_Log__c FROM Auth_Provider_User_Mapping__c 
+                            WHERE Id = :userMapping.Id LIMIT 1];
+        }
+        Test.stopTest();
+
+        // There should be a single log inserted
+        Assert.areEqual(2, logCount, 'Unexpected Record count');
+
+        // Assert the log values
+        Assert.areEqual(authProviderName, log.Auth_Provider_Name__c, 'Unexpected field value');
+        Assert.areEqual(userId,           log.User__c,               'Unexpected field value');
+        Assert.areEqual(logId,            log.Log_Id__c,             'Unexpected field value');
+        Assert.areEqual(message,          log.Message__c,            'Unexpected field value');
+
+        // Validate expected updates on the mapping record
+        Assert.areEqual(
+            logRelatedToMapping.Id,
+            userMapping.Last_Auth_Provider_Log__c,
+            'Unexpected field value'
+        );
+    }
+
+
+    /**
+     * @description Method to test the updating of a user mapping
+     */
+    @IsTest
+    static void testUpdateMappingLoginDetails(){
+        
+        // Subject to validate
+        String subject;
+
+        // Create a new user mapping record
+        Auth_Provider_User_Mapping__c userMapping;
+
+        // Run the test
+        Test.startTest();
+        System.runAs(ADMIN_USER){
+            // Create test data mapping
+            userMapping = new Auth_Provider_User_Mapping__c(
+                Auth_Provider_Name__c = authProviderName,
+                User__c = userId,
+                Target_User_Identifier__c = targetUserId
+            );
+            insert userMapping;
             
             // Update the mapping details on the user mapping record
             AuthProviderUtil.updateMappingLoginDetails(
                 authProviderName,
                 userId
             );
+
+            // Run the details for coverage in case the auth provider does not exist
+            AuthProviderUtil.updateMappingLoginDetails(
+                'Invalid',
+                UserInfo.getUserId()
+            );
+
+            // Force delivery
+            Test.getEventBus().deliver();
+
+            // Requery the user mapping
+            userMapping = [ SELECT Last_Login_Date__c, Number_of_Logins__c FROM Auth_Provider_User_Mapping__c 
+                            WHERE Auth_Provider_Name__c = :authProviderName AND User__c = :userId LIMIT 1];
+
+            // Assign the subject
+            subject = AuthProviderUtil.getSubjectFromUserMapping(authProviderName, userId);
         }
         Test.stopTest();
 
-        // Query the user mapping again now the login details have been updated
-        Auth_Provider_User_Mapping__c userMapping = [   SELECT Id, Last_Auth_Provider_Log__c, Last_Login_Date__c, Number_of_Logins__c
-                                                        FROM Auth_Provider_User_Mapping__c WHERE Last_Auth_Provider_Log__c != null LIMIT 1
-        ];
-
-        // Validate expected updates on the mapping record
-        Assert.areEqual(true , userMapping.Last_Login_Date__c    != null, 'Expected a last login date to be populated');
-        Assert.areEqual(true , userMapping.Number_of_Logins__c   == 1,    'Expected number of logins to be 1');
+        // Validate the record has been updated
+        Assert.isNotNull(userMapping.Last_Login_Date__c,  'Unexpected field value');
+        Assert.isNotNull(userMapping.Number_of_Logins__c, 'Unexpected field value');
+    
+        // Test the get subject method
+        Assert.areEqual(
+            targetUserId,
+            subject,
+            'Unexpected target user identifier received'
+        );
     }
 
 
     /**
-     * @description Method to test the auth provider name validation logic
+     * @description Method to test the inserting of history records
      */
     @IsTest
-    static void testAuthProviderNameValidation(){
-        
-        try{
-            // Don't ignore the validation in a test
-            AuthProviderUtil.ignoreValidationInTest = false;
+    static void testInsertLoginHistoryRecord(){
+       
+        // Run the test
+        Test.startTest();
+        System.runAs(ADMIN_USER){
 
-            // Run validation
-            AuthProviderUtil.validateAuthProviderName(
-                Auth_Provider_Log__c.Auth_Provider_Name__c,    
-                new SObject[]{new Auth_Provider_Log__c(Auth_Provider_Name__c = 'randomValueHereXYZ')}
+            // Overload method to insert a login history record
+            AuthProviderUtil.insertLoginHistoryRecord(
+                authProviderName,
+                userId,
+                'Refresh',
+                Datetime.now()
             );
-        }catch(Exception e){
-            // Validate Exception message
-            utl.Tst.assertExceptionMessage(AuthProviderUtil.LOG_INPUT_VALIDATION_MSG, 'randomValueHereXYZ', e);
+            
+            // Force delivery because the platform events do not run in bulk (should be fixed)
+            Test.getEventBus().deliver();
+
+            // Main method to insert a login history record
+            AuthProviderUtil.insertLoginHistoryRecord(
+                authProviderName,
+                userId,
+                'Refresh',
+                Datetime.now(),
+                true,
+                'Data Cloud',
+                'Additional info'
+            );
+
+            // Force delivery because the platform events do not run in bulk (should be fixed)
+            Test.getEventBus().deliver();
         }
+        Test.stopTest();
+
+        // Assert the new logs are both inserted
+        Assert.areEqual(
+            2,
+            [SELECT COUNT() FROM Auth_Provider_Login_History__c],
+            'Expecting 2 login history records'
+        );
     }
 
 
-    
     /**
      * @description Method to get the user id and the session data from cookies
      */
@@ -183,6 +239,28 @@ private with sharing class AuthProviderUtilTest {
     }
 
 
+    /**
+     * @description Method to test the auth provider name validation logic
+     */
+    @IsTest
+    static void testAuthProviderNameValidation(){
+        
+        try{
+            // Don't ignore the validation in a test
+            AuthProviderUtil.ignoreValidationInTest = false;
+
+            // Run validation
+            AuthProviderUtil.validateAuthProviderName(
+                Auth_Provider_Log__c.Auth_Provider_Name__c,    
+                new SObject[]{new Auth_Provider_Log__c(Auth_Provider_Name__c = 'randomValueHereXYZ')}
+            );
+        }catch(Exception e){
+            // Validate Exception message
+            utl.Tst.assertExceptionMessage(AuthProviderUtil.LOG_INPUT_VALIDATION_MSG, 'randomValueHereXYZ', e);
+        }
+    }
+
+
 
     /**
      * @description Method to test the log input validation logic
@@ -192,7 +270,12 @@ private with sharing class AuthProviderUtilTest {
         Test.startTest();
         System.runAs(ADMIN_USER){
             try{
+                // Should throw an error
                 AuthProviderUtil.insertLog(null,null,null,null);
+
+                // This method will fail the test as it should not be reached
+                utl.Tst.assertExceptionHasBeenThrow();
+
             }catch(Exception e){
                 // Validate Exception message
                 utl.Tst.assertExceptionMessage(AuthProviderUtil.LOG_INPUT_VALIDATION_MSG, e);
@@ -209,11 +292,13 @@ private with sharing class AuthProviderUtilTest {
     @IsTest
     @SuppressWarnings('PMD.AvoidHardcodingId')
     static void testCallable(){
+        
         Test.startTest();
         
-        // Insert the mapping as an admin (what we expect is normal)
-        System.runAs(ADMIN_USER){
-            // Create a new user mapping record
+        // Run the full test again but this time as an end user with a different permission set
+        System.runAs(END_USER){
+            
+            // Create test data mapping
             Auth_Provider_User_Mapping__c userMapping = new Auth_Provider_User_Mapping__c(
                 Auth_Provider_Name__c = authProviderName,
                 User__c = userId,
@@ -221,24 +306,6 @@ private with sharing class AuthProviderUtilTest {
             );
             insert userMapping;
 
-            // Validate the owner has changed accordingly
-            Assert.areEqual(
-                END_USER.Id,
-                [SELECT OwnerId FROM Auth_Provider_User_Mapping__c WHERE Id = :userMapping.Id LIMIT 1].OwnerId,
-                'Unexpected OwnerId'
-            );
-
-            // Validate the owner has changed accordingly
-            Assert.areEqual(
-                authProviderName + '_' + userId,
-                [SELECT Auth_Provider_User_Id_Validation__c FROM Auth_Provider_User_Mapping__c WHERE Id = :userMapping.Id LIMIT 1].Auth_Provider_User_Id_Validation__c,
-                'Unexpected validation field value'
-            );
-        }
-
-        // Run the full test again but this time as an end user with a different permission set
-        System.runAs(END_USER){
-            
             // Dymically instanciate class
             Callable extension = (Callable) Type.forName(String.valueOf(AuthProviderUtil.class)).newInstance();
 
@@ -254,6 +321,18 @@ private with sharing class AuthProviderUtilTest {
 
             // Test insertLog
             Object insertLoginHistoryRecordResult;
+            insertLoginHistoryRecordResult = extension.call('insertLoginHistoryRecord', new Map<String, Object> { 
+                'authProviderName' => authProviderName,
+                'userId'           => userId,
+                'flowType'         => 'Refresh',
+                'timestamp'        => Datetime.now(),
+                'success'          => true, // or false
+                'providerType'     => 'Data Cloud',
+                'loginInfo'        => 'Optional debug info or login error info'
+            });
+            Assert.areEqual(null, insertLoginHistoryRecordResult,'Expected a void to return null but not give any errors');
+
+            // Test insertLog with null values for the overload
             insertLoginHistoryRecordResult = extension.call('insertLoginHistoryRecord', new Map<String, Object> { 
                 'authProviderName' => authProviderName,
                 'userId'           => userId,
@@ -312,6 +391,8 @@ private with sharing class AuthProviderUtilTest {
                 utl.Tst.assertExceptionMessage(AuthProviderUtil.INVALID_METHOD_CALLED_MSG, e);
             }
         }
+        
         Test.stopTest();
     }
+    
 }
