@@ -4,16 +4,16 @@
       "path": "force-app/package",
       "default": true,
       "package": "Lightweight - Auth Provider Util v2",
-      "versionName": "v59.0 - 0.10",
-      "versionNumber": "0.10.0.NEXT",
+      "versionName": "v60.0 - 0.11",
+      "versionNumber": "0.11.0.NEXT",
       "versionDescription": "A lightweight Auth Provider Utility to add support for User Context Mapping and basic (error) logging.",
-      "ancestorVersion": "0.9.0",
+      "ancestorVersion": "0.10.0",
       "dependencies": [
         {
-          "package": "Lightweight - Apex Unit Test Util v2@2.3.0-2"
+          "package": "Lightweight - Apex Unit Test Util v2@2.4.0-2"
         },
         {
-          "package": "Lightweight - REST Util@0.10.0-1"
+          "package": "Lightweight - REST Util@0.11.0-1"
         }
       ]
     },
@@ -21,15 +21,15 @@
       "path": "force-app/package",
       "default": false,
       "package": "Lightweight - Auth Provider Util v2 (Unlocked)",
-      "versionName": "v59.0 - 0.10",
-      "versionNumber": "0.10.0.NEXT",
+      "versionName": "v60.0 - 0.11",
+      "versionNumber": "0.11.0.NEXT",
       "versionDescription": "A lightweight Auth Provider Utility to add support for User Context Mapping and basic (error) logging.",
       "dependencies": [
         {
-          "package": "Lightweight - Apex Unit Test Util v2 (Unlocked)@2.3.0-2"
+          "package": "Lightweight - Apex Unit Test Util v2 (Unlocked)@2.4.0-2"
         },
         {
-          "package": "Lightweight - REST Util (Unlocked)@0.10.0-1"
+          "package": "Lightweight - REST Util (Unlocked)@0.11.0-1"
         }
       ]
     }
@@ -37,12 +37,12 @@
   "name": "lightweight-auth-provider-util",
   "namespace": "lwt",
   "sfdcLoginUrl": "https://login.salesforce.com",
-  "sourceApiVersion": "59.0",
+  "sourceApiVersion": "60.0",
   "packageAliases": {
-    "Lightweight - Apex Unit Test Util v2@2.3.0-2": "04tP30000007oePIAQ",
-    "Lightweight - Apex Unit Test Util v2 (Unlocked)@2.3.0-2": "04tP30000007og1IAA",
-    "Lightweight - REST Util@0.10.0-1": "04tP30000007sN3IAI",
-    "Lightweight - REST Util (Unlocked)@0.10.0-1": "04tP30000007sQHIAY",
+    "Lightweight - Apex Unit Test Util v2@2.4.0-2": "04tP3000000M6OXIA0",
+    "Lightweight - Apex Unit Test Util v2 (Unlocked)@2.4.0-2": "04tP3000000M6Q9IAK",
+    "Lightweight - REST Util@0.11.0-1": "04tP3000000M6gHIAS",
+    "Lightweight - REST Util (Unlocked)@0.11.0-1": "04tP3000000M6htIAC",
     "Lightweight - Auth Provider Util v2": "0Ho4K0000008OYUSA2",
     "Lightweight - Auth Provider Util v2@0.1.0-1": "04t4K000002JuxSQAS",
     "Lightweight - Auth Provider Util v2@0.2.0-1": "04t4K000002JuyzQAC",
@@ -50,16 +50,18 @@
     "Lightweight - Auth Provider Util v2@0.4.0-1": "04tP30000006yO5IAI",
     "Lightweight - Auth Provider Util v2@0.5.0-1": "04tP30000007GUfIAM",
     "Lightweight - Auth Provider Util v2@0.6.0-1": "04tP30000007t1NIAQ",
+    "Lightweight - Auth Provider Util v2@0.7.0-1": "04tP3000000DZxdIAG",
+    "Lightweight - Auth Provider Util v2@0.8.0-1": "04tP3000000DieLIAS",
+    "Lightweight - Auth Provider Util v2@0.9.0-1": "04tP3000000ENG6IAO",
+    "Lightweight - Auth Provider Util v2@0.10.0-1": "04tP3000000ET0XIAW",
     "Lightweight - Auth Provider Util v2 (Unlocked)": "0HoP30000000085KAA",
     "Lightweight - Auth Provider Util v2 (Unlocked)@0.1.0-1": "04tP30000007GXtIAM",
     "Lightweight - Auth Provider Util v2 (Unlocked)@0.6.0-1": "04tP30000007tB3IAI",
-    "Lightweight - Auth Provider Util v2@0.7.0-1": "04tP3000000DZxdIAG",
     "Lightweight - Auth Provider Util v2 (Unlocked)@0.7.0-1": "04tP3000000Da0rIAC",
-    "Lightweight - Auth Provider Util v2@0.8.0-1": "04tP3000000DieLIAS",
     "Lightweight - Auth Provider Util v2 (Unlocked)@0.8.0-1": "04tP3000000Dj5lIAC",
-    "Lightweight - Auth Provider Util v2@0.9.0-1": "04tP3000000ENG6IAO",
     "Lightweight - Auth Provider Util v2 (Unlocked)@0.9.0-1": "04tP3000000ENKvIAO",
-    "Lightweight - Auth Provider Util v2@0.10.0-1": "04tP3000000ET0XIAW",
-    "Lightweight - Auth Provider Util v2 (Unlocked)@0.10.0-1": "04tP3000000ET6zIAG"
+    "Lightweight - Auth Provider Util v2 (Unlocked)@0.10.0-1": "04tP3000000ET6zIAG",
+    "Lightweight - Auth Provider Util v2@0.11.0-1": "04tP3000000M7FlIAK",
+    "Lightweight - Auth Provider Util v2 (Unlocked)@0.11.0-1": "04tP3000000M7HNIA0"
   }
 }
