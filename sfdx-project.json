@@ -4,10 +4,10 @@
       "path": "force-app/package",
       "default": true,
       "package": "Lightweight - Auth Provider Util v2",
-      "versionName": "v60.0 - 0.11",
-      "versionNumber": "0.11.0.NEXT",
+      "versionName": "v60.0 - 0.12",
+      "versionNumber": "0.12.0.NEXT",
       "versionDescription": "A lightweight Auth Provider Utility to add support for User Context Mapping and basic (error) logging.",
-      "ancestorVersion": "0.10.0",
+      "ancestorVersion": "0.11.0",
       "dependencies": [
         {
           "package": "Lightweight - Apex Unit Test Util v2@2.4.0-2"
@@ -21,8 +21,8 @@
       "path": "force-app/package",
       "default": false,
       "package": "Lightweight - Auth Provider Util v2 (Unlocked)",
-      "versionName": "v60.0 - 0.11",
-      "versionNumber": "0.11.0.NEXT",
+      "versionName": "v60.0 - 0.12",
+      "versionNumber": "0.12.0.NEXT",
       "versionDescription": "A lightweight Auth Provider Utility to add support for User Context Mapping and basic (error) logging.",
       "dependencies": [
         {
@@ -62,6 +62,8 @@
     "Lightweight - Auth Provider Util v2 (Unlocked)@0.9.0-1": "04tP3000000ENKvIAO",
     "Lightweight - Auth Provider Util v2 (Unlocked)@0.10.0-1": "04tP3000000ET6zIAG",
     "Lightweight - Auth Provider Util v2@0.11.0-1": "04tP3000000M7FlIAK",
-    "Lightweight - Auth Provider Util v2 (Unlocked)@0.11.0-1": "04tP3000000M7HNIA0"
+    "Lightweight - Auth Provider Util v2 (Unlocked)@0.11.0-1": "04tP3000000M7HNIA0",
+    "Lightweight - Auth Provider Util v2@0.12.0-1": "04tP3000000MVUzIAO",
+    "Lightweight - Auth Provider Util v2 (Unlocked)@0.12.0-1": "04tP3000000MW1FIAW"
   }
 }

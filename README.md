@@ -18,24 +18,24 @@ If you use the *managed package* you need to installed the managed package depen
 |---|---|
 |Name|Lightweight - Apex Unit Test Util v2|
 |Version|2.4.0-1|
-|Managed Installation URL | */packaging/installPackage.apexp?p0=04tP3000000M6OXIA0*
-|Unlocked Installation URL| */packaging/installPackage.apexp?p0=04tP3000000M6Q9IAK*
-|Github URL | https://github.com/jfwberg/lightweight-apex-unit-test-util-v2
+|Managed Installation URL | */packaging/installPackage.apexp?p0=04tP3000000M6OXIA0* |
+|Unlocked Installation URL| */packaging/installPackage.apexp?p0=04tP3000000M6Q9IAK* |
+|Github URL | https://github.com/jfwberg/lightweight-apex-unit-test-util-v2         |
 | | |
 |Name|Lightweight - Apex REST Util|
 |Version|0.11.0-1|
-|Managed Installation URL | */packaging/installPackage.apexp?p0=04tP3000000M6gHIAS*
-|Unlocked Installation URL| */packaging/installPackage.apexp?p0=04tP3000000M6htIAC*
-|Github URL | https://github.com/jfwberg/lightweight-apex-rest-util 
+|Managed Installation URL | */packaging/installPackage.apexp?p0=04tP3000000M6gHIAS* |
+|Unlocked Installation URL| */packaging/installPackage.apexp?p0=04tP3000000M6htIAC* |
+|Github URL | https://github.com/jfwberg/lightweight-apex-rest-util                 |
 
 
 ## Auth Provider Util v2 - Package Info
 | Package Info | Value |
 |---|---|
 |Name|Lightweight - Auth Provider Util v2|
-|Version|0.11.0-1|
-|Managed Installation URL | */packaging/installPackage.apexp?p0=04tP3000000M7FlIAK*
-|Unlocked Installation URL| */packaging/installPackage.apexp?p0=04tP3000000M7HNIA0*
+|Version|0.12.0-1|
+|Managed Installation URL | */packaging/installPackage.apexp?p0=04tP3000000MVUzIAO* |
+|Unlocked Installation URL| */packaging/installPackage.apexp?p0=04tP3000000MW1FIAW* |
 
 ## Assign permissions to Automated Process User
 Since the Spring 24 release platform events started running as the Automated Process User. Making the logging fail due to access issue.

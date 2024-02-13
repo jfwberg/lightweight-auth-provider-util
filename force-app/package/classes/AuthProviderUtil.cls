@@ -450,7 +450,7 @@ global with sharing class AuthProviderUtil implements Callable{
         }
 
         // Get all existing auth provider records
-        for(AuthProvider authProvider : [SELECT DeveloperName FROM AuthProvider WHERE DeveloperName IN :authProviderNames WITH SECURITY_ENFORCED]){
+        for(AuthProvider authProvider : [SELECT DeveloperName FROM AuthProvider WHERE DeveloperName IN :authProviderNames]){
             existingAuthProviderNames.add(authProvider.DeveloperName.toLowerCase());
         }
 
